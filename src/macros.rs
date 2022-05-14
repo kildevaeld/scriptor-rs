@@ -1,3 +1,4 @@
+#[allow(unused_macros)]
 macro_rules! throw {
     ($error: expr) => {
         rquickjs::Error::Exception {
@@ -12,6 +13,7 @@ macro_rules! throw {
     };
 }
 
+#[cfg(any(feature = "fs", feature = "os"))]
 macro_rules! stream {
     ($file: ty) => {
         impl rquickjs::ClassDef for $crate::JsStream<$file> {
@@ -100,6 +102,7 @@ macro_rules! stream {
     };
 }
 
+#[cfg(any(feature = "fs", feature = "os"))]
 macro_rules! readwriter {
     ($file: ident) => {
         stream!(tokio_stream::wrappers::LinesStream<tokio::io::BufReader<$crate::FileDesc<$file>>>);
@@ -170,6 +173,7 @@ macro_rules! readwriter {
     };
 }
 
+#[cfg(any(feature = "fs", feature = "os"))]
 macro_rules! writer {
     ($file: ty) => {
         impl rquickjs::ClassDef for $crate::FileDesc<$file> {
@@ -251,6 +255,7 @@ macro_rules! writer {
     };
 }
 
+#[cfg(any(feature = "fs", feature = "os"))]
 macro_rules! reader {
     ($file: ty) => {
         impl rquickjs::ClassDef for $crate::FileDesc<$file> {

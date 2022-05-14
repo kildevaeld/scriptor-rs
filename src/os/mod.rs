@@ -1,4 +1,4 @@
-use rquickjs::{Accessor, Class, Func, ModuleDef};
+use rquickjs::{Class, Func, ModuleDef};
 
 use crate::file_desc::{FileDesc, Named};
 

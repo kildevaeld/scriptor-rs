@@ -1,21 +1,11 @@
 use std::error::Error;
 
-use rquickjs::{BuiltinResolver, Context, Func, Function, ModuleLoader, Promise, Runtime};
+use rquickjs::{Context, Func, Function, Promise, Runtime};
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let rt = Runtime::new()?;
     let ctx = Context::full(&rt)?;
-
-    // let resolver = BuiltinResolver::default()
-    //     .with_module("http")
-    //     .with_module("fs")
-    //     .with_module("os");
-
-    // let loader = ModuleLoader::default()
-    //     .with_module("http", scriptor::http::Module)
-    //     .with_module("fs", scriptor::fs::Module)
-    //     .with_module("os", scriptor::os::Module);
 
     let (resolver, loader) = scriptor::create();
 

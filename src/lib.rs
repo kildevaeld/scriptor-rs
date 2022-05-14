@@ -1,10 +1,12 @@
 #[macro_use]
 mod macros;
 
-mod builder;
+// mod builder;
+#[cfg(any(feature = "fs", feature = "os"))]
 mod file_desc;
 pub mod global;
 mod process;
+#[cfg(any(feature = "fs", feature = "os"))]
 mod stream;
 
 #[cfg(feature = "typescript")]
@@ -23,9 +25,12 @@ pub mod fs;
 #[cfg(feature = "os")]
 pub mod os;
 
+#[cfg(any(feature = "fs", feature = "os"))]
 pub(crate) use file_desc::*;
+#[cfg(any(feature = "fs", feature = "os"))]
 pub(crate) use stream::*;
 
+#[allow(unused_mut)]
 pub fn create() -> (impl Resolver, impl Loader) {
     let mut resolver = BuiltinResolver::default();
     let mut loader = ModuleLoader::default();

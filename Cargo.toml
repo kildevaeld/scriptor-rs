@@ -6,9 +6,7 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = [
-  "full",
-]
+default = ["full"]
 
 full = [
   "fs",
@@ -37,8 +35,6 @@ reqwest = {version = "0.11", optional = true}
 
 futures-core = "0.3"
 futures-lite = "1"
-
-pin-project = "1"
 
 # Typescript
 swc = {version = "0.174.0", optional = true}

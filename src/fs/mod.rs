@@ -1,8 +1,7 @@
 mod file;
 
-use rquickjs::{bind, Async, Class, Func, ModuleDef, Result};
-
 use crate::{stream::JsStream, FileDesc};
+use rquickjs::{Async, Class, Func, ModuleDef, Result};
 
 pub struct Module;
 

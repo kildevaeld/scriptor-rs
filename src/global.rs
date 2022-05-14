@@ -20,7 +20,7 @@ class_def! {
 pub struct TextDecoder;
 
 impl TextDecoder {
-    pub fn decode<'js>(&self, ctx: Ctx<'js>, string: Vec<u8>) -> Result<String> {
+    pub fn decode<'js>(&self, _ctx: Ctx<'js>, string: Vec<u8>) -> Result<String> {
         let s = String::from_utf8(string)?;
         Ok(s)
     }
