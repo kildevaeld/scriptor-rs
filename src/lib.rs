@@ -30,6 +30,9 @@ pub(crate) use file_desc::*;
 #[cfg(any(feature = "fs", feature = "os"))]
 pub(crate) use stream::*;
 
+#[cfg(any(feature = "fs", feature = "os"))]
+pub use stream::PIPE;
+
 #[allow(unused_mut)]
 pub fn create() -> (impl Resolver, impl Loader) {
     let mut resolver = BuiltinResolver::default();

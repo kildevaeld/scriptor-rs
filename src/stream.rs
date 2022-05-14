@@ -3,7 +3,7 @@ use std::sync::Arc;
 use futures_core::{future::BoxFuture, Stream};
 use futures_lite::StreamExt;
 
-use rquickjs::IntoJs;
+use rquickjs::{embed, IntoJs};
 use tokio::sync::Mutex;
 
 #[derive(IntoJs)]
@@ -54,3 +54,6 @@ where
         })
     }
 }
+
+#[embed(path = "src", public)]
+pub mod pipe {}
