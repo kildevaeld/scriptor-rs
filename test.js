@@ -1,4 +1,4 @@
-import { open } from "fs";
+import { open, readDir } from "fs";
 import { stdout } from "os";
 
 const decoder = new TextDecoder();
@@ -13,7 +13,13 @@ export async function main() {
     print(line);
   }
 
-  await delay(1000);
+  const listDir = await readDir(".");
+
+  for await (const entry of listDir) {
+    print("line " + entry.path());
+  }
+
+  print(import.meta.url);
 }
 
 async function* combine(iterable) {

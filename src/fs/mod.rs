@@ -1,7 +1,10 @@
 mod file;
+mod read_dir;
 
 use crate::{stream::JsStream, FileDesc};
 use rquickjs::{Async, Class, Func, ModuleDef, Result};
+
+use self::read_dir::{DirEntry, ReadDir};
 
 pub struct Module;
 
@@ -31,6 +34,8 @@ impl ModuleDef for Module {
         module.add("readFile")?;
         module.add("writeFile")?;
 
+        module.add("readDir")?;
+
         Ok(())
     }
 
@@ -47,6 +52,9 @@ impl ModuleDef for Module {
             >,
         >::register(ctx)?;
 
+        Class::<JsStream<ReadDir>>::register(ctx)?;
+        Class::<DirEntry>::register(ctx)?;
+
         module.set(
             "open",
             Func::new(
@@ -61,6 +69,18 @@ impl ModuleDef for Module {
         module.set("writeFile", Func::from((Async(write), Async(write_str))))?;
 
         module.set("readFile", Func::from(Async(read)))?;
+
+        module.set(
+            "readDir",
+            Func::from(Async(|path: String| {
+                //
+                async move {
+                    Result::<_>::Ok(JsStream::new(ReadDir {
+                        dir: tokio::fs::read_dir(path).await.map_err(throw!())?,
+                    }))
+                }
+            })),
+        )?;
 
         Ok(())
     }
