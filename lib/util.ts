@@ -33,7 +33,7 @@ export function createConsole(print: (input: string) => void): Console {
         })
         .join(" ");
 
-      print(out);
+      print(out + "\n");
       //   print(args.map((m) => format(m)).join(" "));
     },
   };
