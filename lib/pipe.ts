@@ -110,7 +110,7 @@ async function* filter<T>(
   }
 }
 
-async function* array<T>(a: T[]): AsyncIterable<T> {
+async function* iter<T>(a: Iterable<T>): AsyncIterable<T> {
   for (const item of a) {
     yield item;
   }
@@ -134,7 +134,7 @@ export async function* combine<T extends any[]>(iterable: T) {
     if (o[Symbol.asyncIterator]) {
       return o[Symbol.asyncIterator]();
     } else {
-      return array(o);
+      return iter(o);
     }
   });
   const results = [];

@@ -1,8 +1,10 @@
 declare module "pipe" {
   export type Result<T> = Promise<T> | T;
+
   export function pipe<T>(
     pipe: AsyncIterable<T> | Promise<AsyncIterable<T>>
   ): Pipe<T>;
+
   export class Pipe<T> {
     private _stream;
     static from(array: any): Pipe<any>;
@@ -17,6 +19,9 @@ declare module "pipe" {
     combine(stream: unknown[]): Pipe<T>;
     [Symbol.asyncIterator](): AsyncIterator<T, any, undefined>;
   }
+
+  export function iter<T>(a: Iterable<T>): AsyncIterable<T>;
+
   export function combine<T extends any[]>(
     iterable: T
   ): AsyncGenerator<any, void, unknown>;
