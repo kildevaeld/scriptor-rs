@@ -56,5 +56,5 @@ pub fn create() -> (impl Resolver, impl Loader) {
         loader.add_module("os", os::Module);
     }
 
-    (resolver, loader)
+    ((resolver, PIPE, UTIL), (loader, PIPE, UTIL))
 }
