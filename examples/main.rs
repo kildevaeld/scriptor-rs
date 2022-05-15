@@ -16,7 +16,9 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     ctx.with(|ctx| scriptor::global::init(ctx))?;
 
-    let source = tokio::fs::read_to_string("test.js").await?;
+    let source = tokio::fs::read_to_string("test.ts").await?;
+
+    let source = scriptor::compile("test.ts", source)?;
 
     tokio::task::LocalSet::default()
         .run_until(async move {
@@ -32,7 +34,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                     }),
                 )?;
 
-                let module = ctx.compile("test.js", source)?;
+                let module = ctx.compile("test.ts", source)?;
 
                 let func: Function = module.get("main")?;
 
