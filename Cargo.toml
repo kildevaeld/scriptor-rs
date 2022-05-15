@@ -23,7 +23,7 @@ typescript = ["swc", "swc_common", "swc_ecma_parser"]
 [[example]]
 name = "main"
 path = "examples/main.rs"
-required-features = ["full"]
+required-features = ["full", "typescript"]
 
 [dependencies]
 rquickjs = {version = "0.1", features = ["tokio", "macro", "futures", "loader", "array-buffer"]}
@@ -45,3 +45,9 @@ swc_ecma_parser = {version = "0.102.13", optional = true}
 
 [dev-dependencies]
 tokio = {version = "1", features = ["sync", "io-util", "rt", "macros"]}
+
+[build-dependencies]
+# Typescript
+swc = {version = "0.174.0"}
+swc_common = {version = "0.17.24", features = ["tty-emitter"]}
+swc_ecma_parser = {version = "0.102.13"}

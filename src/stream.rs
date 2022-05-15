@@ -55,5 +55,5 @@ where
     }
 }
 
-#[embed(path = "src", public)]
+#[embed(path = "lib", public)]
 pub mod pipe {}

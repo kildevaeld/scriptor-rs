@@ -4,4 +4,5 @@ declare interface Read {
 
 declare interface Write {
   write(data: Uint8Array): Promise<void>;
+  flush(): Promise<void>;
 }

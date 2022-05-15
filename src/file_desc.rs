@@ -1,5 +1,5 @@
 use futures_core::future::BoxFuture;
-use rquickjs::Result;
+use rquickjs::{Ctx, Result, TypedArray};
 use std::{pin::Pin, sync::Arc};
 use tokio::{
     io::{AsyncBufReadExt, AsyncRead, AsyncReadExt, AsyncSeek, AsyncWrite, AsyncWriteExt},
@@ -67,8 +67,10 @@ impl<F: AsyncRead> AsyncRead for FileDesc<F> {
 }
 
 impl<F: AsyncWrite + std::marker::Unpin + Send + 'static + Sync> FileDesc<F> {
-    pub fn write(&mut self, data: Vec<u8>) -> BoxFuture<'static, Result<()>> {
+    pub fn write(&mut self, data: TypedArray<'_, u8>) -> BoxFuture<'static, Result<()>> {
         let file = self.file.clone();
+        let data: &[u8] = data.as_ref();
+        let data = data.to_vec();
         Box::pin(async move {
             let mut file = file.write().await;
             file.write_all(&data).await.map_err(throw!())

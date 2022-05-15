@@ -14,7 +14,7 @@ class_def! {
         //     this.entry.path().as_os_str().to_string_lossy().to_string()
         // })))?;
 
-        proto.set("path", Func::from(Method(|this: &DirEntry| {
+        proto.prop("path", Accessor::from(Method(|this: &DirEntry| {
             this.entry.path().as_os_str().to_string_lossy().to_string()
         })))?;
 

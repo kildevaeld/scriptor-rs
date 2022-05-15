@@ -9,6 +9,8 @@ mod process;
 #[cfg(any(feature = "fs", feature = "os"))]
 mod stream;
 
+mod bundle;
+
 #[cfg(feature = "typescript")]
 mod typescript_loader;
 
@@ -25,13 +27,12 @@ pub mod fs;
 #[cfg(feature = "os")]
 pub mod os;
 
+pub use bundle::{PIPE, UTIL};
+
 #[cfg(any(feature = "fs", feature = "os"))]
 pub(crate) use file_desc::*;
 #[cfg(any(feature = "fs", feature = "os"))]
 pub(crate) use stream::*;
-
-#[cfg(any(feature = "fs", feature = "os"))]
-pub use stream::PIPE;
 
 #[allow(unused_mut)]
 pub fn create() -> (impl Resolver, impl Loader) {

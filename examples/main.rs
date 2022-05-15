@@ -9,7 +9,10 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     let (resolver, loader) = scriptor::create();
 
-    rt.set_loader((resolver, scriptor::PIPE), (loader, scriptor::PIPE));
+    rt.set_loader(
+        (resolver, scriptor::PIPE, scriptor::UTIL),
+        (loader, scriptor::PIPE, scriptor::UTIL),
+    );
 
     ctx.with(|ctx| scriptor::global::init(ctx))?;
 
