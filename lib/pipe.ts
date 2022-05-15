@@ -110,7 +110,7 @@ async function* filter<T>(
   }
 }
 
-async function* iter<T>(a: Iterable<T>): AsyncIterable<T> {
+export async function* iter<T>(a: Iterable<T>): AsyncIterable<T> {
   for (const item of a) {
     yield item;
   }
