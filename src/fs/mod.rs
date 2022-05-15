@@ -59,10 +59,29 @@ impl ModuleDef for Module {
             "open",
             Func::new(
                 "open",
-                Async(|path: String| async move {
-                    let file = tokio::fs::File::open(path).await.map_err(throw!())?;
-                    Result::<_>::Ok(FileDesc::new(file))
-                }),
+                (
+                    Async(|path: String| async move {
+                        let file = tokio::fs::File::open(path).await.map_err(throw!())?;
+                        Result::<_>::Ok(FileDesc::new(file))
+                    }),
+                    Async(|path: String, mode: String| async move {
+                        let mut opts = tokio::fs::OpenOptions::new();
+
+                        for ch in mode.chars() {
+                            match ch {
+                                'r' => opts.read(true),
+                                'w' => opts.write(true),
+                                'a' => opts.append(true),
+                                't' => opts.truncate(true),
+                                'c' => opts.create(true),
+                                _ => &mut opts,
+                            };
+                        }
+
+                        let file = opts.open(path).await.map_err(throw!())?;
+                        Result::<_>::Ok(FileDesc::new(file))
+                    }),
+                ),
             ),
         )?;
 

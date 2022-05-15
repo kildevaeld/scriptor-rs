@@ -105,14 +105,17 @@ pub fn compile(name: &str, source: impl ToString) -> Result<String, Error> {
             &handler,
             &Options {
                 config: swc::config::Config {
-                    minify: true,
                     jsc: JscConfig {
+                        target: EsVersion::Es2017.into(),
+                        external_helpers: false,
                         syntax: Some(swc_ecma_parser::Syntax::Typescript(
                             swc_ecma_parser::TsConfig {
                                 tsx: true,
+
                                 ..Default::default()
                             },
                         )),
+
                         ..Default::default()
                     },
                     ..Default::default()
