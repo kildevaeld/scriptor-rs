@@ -12,11 +12,13 @@ full = [
   "fs",
   "os",
   "http",
+  "vm",
 ]
 
 fs = ["tokio/fs"]
 http = ["reqwest"]
 os = ["tokio/io-std"]
+vm = ["tokio/fs"]
 
 typescript = ["swc", "swc_common", "swc_ecma_parser"]
 

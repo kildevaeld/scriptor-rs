@@ -1,6 +1,9 @@
 #[macro_use]
 mod macros;
 
+#[cfg(feature = "vm")]
+mod vm;
+
 // mod builder;
 #[cfg(any(feature = "fs", feature = "os"))]
 mod file_desc;
@@ -28,6 +31,11 @@ pub mod fs;
 pub mod os;
 
 pub use bundle::{PIPE, UTIL};
+
+#[cfg(feature = "vm")]
+pub use vm::*;
+
+pub use rquickjs::{Error, Result};
 
 #[cfg(any(feature = "fs", feature = "os"))]
 pub(crate) use file_desc::*;

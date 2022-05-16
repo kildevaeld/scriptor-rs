@@ -18,7 +18,9 @@ export async function main() {
     .map((m) => decoder.decode(m))
     .join("\n\n");
 
-  console.log(lines);
+  // console.log(lines);
 
-  await writeFile("scriptor.d.ts", lines);
+  // await writeFile("scriptor.d.ts", lines);
+  // await delay(1000);
+  console.log("done");
 }

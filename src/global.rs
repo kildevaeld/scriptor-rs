@@ -58,7 +58,11 @@ pub fn init(ctx: Ctx<'_>) -> Result<()> {
         Func::new(
             "delay",
             Async(|number: u64| async move {
-                tokio::time::sleep(Duration::from_millis(number)).await;
+                Result::<_>::Ok(
+                    tokio::spawn(tokio::time::sleep(Duration::from_millis(number)))
+                        .await
+                        .map_err(throw!())?,
+                )
             }),
         ),
     )?;

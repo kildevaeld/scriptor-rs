@@ -7,3 +7,5 @@ declare class TextEncoder {
 declare class TextDecoder {
   decode(text: Uint8Array): string;
 }
+
+declare function delay(timeout: number): Promise<void>;
