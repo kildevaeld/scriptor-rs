@@ -3,10 +3,12 @@ use std::error::Error;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    let vm = Vm::new(".")?;
-
     tokio::task::LocalSet::default()
-        .run_until(async move { vm.run_main("test.ts", ()).await })
+        .run_until(async move {
+            let vm = Vm::new(".")?;
+
+            vm.run_main("test.ts", "Hello").await
+        })
         .await?;
 
     Ok(())

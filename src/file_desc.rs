@@ -1,5 +1,5 @@
 use futures_core::future::BoxFuture;
-use rquickjs::{Ctx, Result, TypedArray};
+use rquickjs::{Result, TypedArray};
 use std::{pin::Pin, sync::Arc};
 use tokio::{
     io::{AsyncBufReadExt, AsyncRead, AsyncReadExt, AsyncSeek, AsyncWrite, AsyncWriteExt},

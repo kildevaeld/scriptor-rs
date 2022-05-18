@@ -9,7 +9,7 @@ globalThis.console = createConsole((arg) => {
   enqueueTask(p);
 });
 
-export async function main(path: string) {
+export async function main(path: string, arg: unknown) {
   const module = await import(path);
 
   if (!module) {
@@ -18,9 +18,9 @@ export async function main(path: string) {
 
   try {
     if (typeof module.default === "function") {
-      await module.default();
+      await module.default(arg);
     } else if (typeof module.main === "function") {
-      await module.main();
+      await module.main(arg);
     }
   } finally {
     await awaitAllTasks();

@@ -45,8 +45,8 @@ const encoder = new TextEncoder();
 //   QUEUE.push(p);
 // });
 
-export async function main() {
-  console.log("Started");
+export async function main(greet) {
+  console.log("Started", greet);
   const lines = await pipe(readDir("types"))
     .filter((m) => !m.path.endsWith("index.d.ts"))
     .map((m) => readFile(m.path))

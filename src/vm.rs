@@ -1,11 +1,10 @@
+use rquickjs::{
+    BuiltinResolver, Context, Ctx, FileResolver, Function, IntoJs, ModuleDef, ModuleLoader,
+    Promise, Result, Runtime,
+};
 use std::{
     path::{Path, PathBuf},
     time::Duration,
-};
-
-use rquickjs::{
-    AsArguments, BuiltinResolver, Bundle, Context, Ctx, FileResolver, Func, Function, IntoJs,
-    Loader, ModuleDef, ModuleLoader, Promise, Resolver, Result, Runtime, ScriptLoader,
 };
 
 #[cfg(feature = "os")]
@@ -116,6 +115,8 @@ impl VmBuilder {
         let rt = Runtime::new()?;
         let ctx = Context::full(&rt)?;
 
+        rt.spawn_executor(rquickjs::Tokio);
+
         rt.set_loader(
             (resolver, UTIL, PIPE, TASKS, script_resolver),
             (loader, UTIL, PIPE, TASKS, script_loader),
@@ -123,18 +124,16 @@ impl VmBuilder {
 
         ctx.with(|ctx| crate::global::init(ctx))?;
 
-        Ok(Vm {
-            rt,
-            ctx,
-            cfg: Some(Box::new(config)),
-        })
+        ctx.with(config)?;
+
+        Ok(Vm { rt, ctx })
     }
 }
 
 pub struct Vm {
     rt: Runtime,
     ctx: Context,
-    cfg: Option<Box<dyn FnMut(Ctx<'_>) -> Result<()>>>,
+    // cfg: Option<Box<dyn FnMut(Ctx<'_>) -> Result<()>>>,
 }
 
 impl Vm {
@@ -157,57 +156,12 @@ impl Vm {
         builder.cwd(work_path);
         builder.build()
     }
-    // pub fn new(work_path: impl AsRef<Path>) -> Result<Vm> {
-    //     let rt = Runtime::new()?;
-    //     let ctx = Context::full(&rt)?;
-
-    //     let (resolver, loader) = Vm::create_loaders(work_path.as_ref());
-
-    //     rt.set_loader(resolver, loader);
-
-    //     ctx.with(|ctx| crate::global::init(ctx))?;
-
-    //     Ok(Vm { rt, ctx })
-    // }
-
-    // fn create_loaders(cwd: &Path) -> (impl Resolver, impl Loader) {
-    //     let (resolver, loader) = crate::create();
-
-    //     let mut script_resolver =
-    //         FileResolver::default().with_path(&cwd.as_os_str().to_string_lossy());
-
-    //     #[cfg(feature = "typescript")]
-    //     script_resolver.add_pattern("{}.ts");
-
-    //     #[cfg(not(feature = "typescript"))]
-    //     let script_loader = ScriptLoader::default();
-
-    //     #[cfg(feature = "typescript")]
-    //     let script_loader = crate::TypescriptFileLoader::default();
-
-    //     ((resolver, script_resolver), (loader, script_loader))
-    // }
 
     pub async fn run_main<A>(mut self, path: impl AsRef<Path>, args: A) -> Result<()>
     where
         for<'js> A: IntoJs<'js>,
     {
-        let handle = self.rt.spawn_executor(rquickjs::Tokio);
-
         let idle = self.rt.idle();
-
-        self.ctx.with(|ctx| {
-            ctx.globals().set(
-                "print",
-                Func::from(|arg: String| {
-                    println!("print: {}", arg);
-                }),
-            )
-        })?;
-
-        if let Some(cfg) = self.cfg.take() {
-            self.ctx.with(cfg)?;
-        }
 
         #[cfg(not(feature = "os"))]
         let source = tokio::fs::read_to_string(path).await?;
@@ -243,8 +197,6 @@ impl Vm {
 
         idle.await;
         // handle.await.map_err(throw!())?;
-
-        drop(handle);
 
         Ok(())
     }
