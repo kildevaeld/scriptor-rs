@@ -133,7 +133,6 @@ impl VmBuilder {
 pub struct Vm {
     rt: Runtime,
     ctx: Context,
-    // cfg: Option<Box<dyn FnMut(Ctx<'_>) -> Result<()>>>,
 }
 
 impl Vm {
@@ -157,7 +156,7 @@ impl Vm {
         builder.build()
     }
 
-    pub async fn run_main<A>(mut self, path: impl AsRef<Path>, args: A) -> Result<()>
+    pub async fn run_main<A>(&mut self, path: impl AsRef<Path>, args: A) -> Result<()>
     where
         for<'js> A: IntoJs<'js>,
     {
@@ -186,8 +185,6 @@ impl Vm {
             })?
             .await?;
 
-        tokio::time::sleep(Duration::from_millis(1)).await;
-
         if self.rt.is_job_pending() {
             while self.rt.is_job_pending() {
                 self.rt.execute_pending_job()?;
@@ -196,7 +193,6 @@ impl Vm {
         }
 
         idle.await;
-        // handle.await.map_err(throw!())?;
 
         Ok(())
     }

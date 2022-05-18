@@ -5,7 +5,7 @@ use std::error::Error;
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     tokio::task::LocalSet::default()
         .run_until(async move {
-            let vm = Vm::new(".")?;
+            let mut vm = Vm::new(".")?;
 
             vm.run_main("test.ts", "Hello").await
         })

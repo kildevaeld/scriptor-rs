@@ -59,8 +59,8 @@ export async function main(greet) {
   // await delay(1000);
   console.log("done");
 
-  // for (let i = 0; i < 2000; i++) {
-  //   console.log("TEST ");
-  //   // delay(10);
-  // }
+  for (let i = 0; i < 2000; i++) {
+    console.log("TEST ");
+    // delay(10);
+  }
 }
