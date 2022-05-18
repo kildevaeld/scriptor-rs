@@ -56,3 +56,5 @@ impl ModuleDef for Module {
         Ok(())
     }
 }
+
+module_def!(os, Module);

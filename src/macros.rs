@@ -334,3 +334,15 @@ macro_rules! reader {
         }
     };
 }
+
+macro_rules! module_def {
+    ($name: ident, $ident: ident) => {
+        #[cfg(feature = "vm")]
+        impl $crate::vm::IntoUserModule for $ident {
+            type UserModule = $crate::vm::UserModuleImpl<$ident, &'static str>;
+            fn into_module(self) -> Self::UserModule {
+                $crate::vm::UserModuleImpl::new(stringify!($name), self)
+            }
+        }
+    };
+}

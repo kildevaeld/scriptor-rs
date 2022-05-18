@@ -79,6 +79,8 @@ impl ModuleDef for Module {
     }
 }
 
+module_def!(http, Module);
+
 pub fn init(resolver: &mut BuiltinResolver, loader: &mut ModuleLoader) {
     resolver.add_module("http");
     loader.add_module("http", Module);

@@ -33,7 +33,7 @@ pub mod os;
 pub use bundle::{PIPE, TASKS, UTIL};
 
 #[cfg(feature = "vm")]
-pub use vm::*;
+pub use vm::{Vm, VmBuilder};
 
 pub use rquickjs::{Error, Result};
 

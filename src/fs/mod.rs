@@ -104,3 +104,5 @@ impl ModuleDef for Module {
         Ok(())
     }
 }
+
+module_def!(fs, Module);
