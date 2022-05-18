@@ -269,6 +269,10 @@ impl Vm {
         builder.build()
     }
 
+    pub fn with<F: FnOnce(Ctx) -> R, R>(&self, func: F) -> R {
+        self.ctx.with(func)
+    }
+
     pub async fn run_main<A>(&mut self, path: impl AsRef<Path>, args: A) -> Result<()>
     where
         for<'js> A: IntoJs<'js>,
