@@ -72,12 +72,8 @@ impl<F: AsyncWrite + std::marker::Unpin + Send + 'static + Sync> FileDesc<F> {
         let data: &[u8] = data.as_ref();
         let data = data.to_vec();
         Box::pin(async move {
-            tokio::spawn(async move {
-                let mut file = file.write().await;
-                file.write_all(&data).await.map_err(throw!())
-            })
-            .await
-            .map_err(throw!())?
+            let mut file = file.write().await;
+            file.write_all(&data).await.map_err(throw!())
         })
     }
 

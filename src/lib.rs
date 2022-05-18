@@ -30,7 +30,7 @@ pub mod fs;
 #[cfg(feature = "os")]
 pub mod os;
 
-pub use bundle::{PIPE, UTIL};
+pub use bundle::{PIPE, TASKS, UTIL};
 
 #[cfg(feature = "vm")]
 pub use vm::*;
@@ -64,5 +64,5 @@ pub fn create() -> (impl Resolver, impl Loader) {
         loader.add_module("os", os::Module);
     }
 
-    ((resolver, PIPE, UTIL), (loader, PIPE, UTIL))
+    ((resolver, PIPE, UTIL, TASKS), (loader, PIPE, UTIL, TASKS))
 }

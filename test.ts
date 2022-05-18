@@ -6,9 +6,44 @@ import { createConsole } from "util";
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 
-const console = createConsole((arg) => {
-  stdout.write(encoder.encode(arg));
-});
+// let KEY = 0;
+// function uniqueKey() {
+//   return KEY++;
+// }
+
+// class Queue {
+//   tasks: Map<number, Promise<unknown>> = new Map();
+
+//   push<T>(task: Promise<T>): Promise<T> {
+//     let id = uniqueKey();
+//     this.tasks.set(id, task);
+
+//     return task.then(
+//       (resp) => {
+//         this.tasks.delete(id);
+//         return resp;
+//       },
+//       (err) => {
+//         this.tasks.delete(id);
+//         // delete this.tasks[id];
+//         throw err;
+//       }
+//     );
+//   }
+
+//   async wait() {
+//     // print("Vent " + this.tasks.values().length);
+//     await delay(60);
+//     await Promise.all(Array.from(this.tasks.values()));
+//   }
+// }
+
+// const QUEUE = new Queue();
+
+// const console = createConsole((arg) => {
+//   const p = stdout.write(encoder.encode(arg));
+//   QUEUE.push(p);
+// });
 
 export async function main() {
   console.log("Started");
@@ -23,4 +58,9 @@ export async function main() {
   // await writeFile("scriptor.d.ts", lines);
   // await delay(1000);
   console.log("done");
+
+  for (let i = 0; i < 2000; i++) {
+    console.log("TEST ");
+    // delay(10);
+  }
 }

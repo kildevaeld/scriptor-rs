@@ -1,9 +1,13 @@
 fn main() {
     println!("cargo:rerun-if-changed=lib/pipe.ts");
     println!("cargo:rerun-if-changed=lib/util.ts");
+    println!("cargo:rerun-if-changed=lib/main.ts");
+    println!("cargo:rerun-if-changed=lib/tasks.ts");
 
     std::fs::write("lib/util.js", compile_jsx("lib/util.ts")).expect("write file");
     std::fs::write("lib/pipe.js", compile_jsx("lib/pipe.ts")).expect("write file");
+    std::fs::write("lib/main.js", compile_jsx("lib/main.ts")).expect("write file");
+    std::fs::write("lib/tasks.js", compile_jsx("lib/tasks.ts")).expect("write file");
 }
 
 use std::sync::Arc;

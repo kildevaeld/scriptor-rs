@@ -1,9 +1,14 @@
-use std::path::{Path, PathBuf};
-
-use rquickjs::{
-    Context, FileResolver, Function, Loader, Promise, Resolver, Result, Runtime, ScriptLoader,
+use std::{
+    path::{Path, PathBuf},
+    time::Duration,
 };
 
+use rquickjs::{
+    Context, FileResolver, Func, Function, Loader, Promise, Resolver, Result, Runtime, ScriptLoader,
+};
+
+#[cfg(feature = "os")]
+static MAIN: &'static str = include_str!("../lib/main.js");
 pub struct Vm {
     rt: Runtime,
     ctx: Context,
@@ -42,29 +47,55 @@ impl Vm {
     }
 
     pub async fn run_main(self, path: impl AsRef<Path>) -> Result<()> {
+        let handle = self.rt.spawn_executor(rquickjs::Tokio);
+
+        let idle = self.rt.idle();
+
+        self.ctx.with(|ctx| {
+            ctx.globals().set(
+                "print",
+                Func::from(|arg: String| {
+                    println!("print: {}", arg);
+                }),
+            )
+        })?;
+
+        #[cfg(not(feature = "os"))]
         let source = tokio::fs::read_to_string(path).await?;
 
-        self.rt.spawn_executor(rquickjs::Tokio);
-
-        #[cfg(feature = "typescript")]
+        #[cfg(all(feature = "typescript", not(feature = "os")))]
         let source = crate::compile("main", source).map_err(throw!())?;
 
         self.ctx
             .with(|ctx| {
-                let module = ctx.compile("main", source)?;
-                let main: Function = module.get("main")?;
-
-                main.call::<_, Promise<()>>(())
+                cfg_if::cfg_if! {
+                    if #[cfg(not(feature = "os"))] {
+                        let module = ctx.compile("main", source)?;
+                        let main: Function = module.get("main")?;
+                        main.call::<_, Promise<()>>(())
+                    } else {
+                        let module = ctx.compile("main", MAIN)?;
+                        let main: Function = module.get("main")?;
+                        let path = path.as_ref().to_string_lossy().to_string();
+                        main.call::<_, Promise<()>>((path,))
+                    }
+                }
             })?
             .await?;
 
-        self.rt.idle().await;
+        tokio::time::sleep(Duration::from_millis(1)).await;
 
         if self.rt.is_job_pending() {
-            println!("pending");
+            while self.rt.is_job_pending() {
+                self.rt.execute_pending_job()?;
+                tokio::task::yield_now().await;
+            }
         }
 
+        idle.await;
         // handle.await.map_err(throw!())?;
+
+        drop(handle);
 
         Ok(())
     }
