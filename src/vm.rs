@@ -1,9 +1,11 @@
 use rquickjs::{
-    BuiltinResolver, Context, Ctx, FileResolver, Function, IntoJs, ModuleDef, ModuleLoader,
-    Promise, Result, Runtime,
+    BuiltinResolver, Bundle, Context, Ctx, FileResolver, Function, IntoJs, Loader, ModuleDef,
+    ModuleLoader, Promise, Resolver, Result, Runtime, Script,
 };
 use std::{
+    cell::RefCell,
     path::{Path, PathBuf},
+    rc::Rc,
     time::Duration,
 };
 
@@ -63,9 +65,107 @@ impl UserModule for Box<dyn UserModule> {
     }
 }
 
+//
+
+pub trait BundleModule {
+    fn load<'js>(
+        &mut self,
+        ctx: Ctx<'js>,
+        name: &str,
+    ) -> Result<rquickjs::Module<'js, rquickjs::Loaded<()>>>;
+
+    fn resolve<'js>(&mut self, ctx: Ctx<'js>, base: &str, name: &str) -> Result<String>;
+}
+
+impl BundleModule for Box<dyn BundleModule> {
+    fn load<'js>(
+        &mut self,
+        ctx: Ctx<'js>,
+        name: &str,
+    ) -> Result<rquickjs::Module<'js, rquickjs::Loaded<()>>> {
+        (&mut **self).load(ctx, name)
+    }
+
+    fn resolve<'js>(&mut self, ctx: Ctx<'js>, base: &str, name: &str) -> Result<String> {
+        (&mut **self).resolve(ctx, base, name)
+    }
+}
+
+// impl Loader<Script> for Box<dyn BundleModule> {
+//     fn load<'js>(
+//         &mut self,
+//         ctx: Ctx<'js>,
+//         name: &str,
+//     ) -> Result<rquickjs::Module<'js, rquickjs::Loaded<Script>>> {
+//         <Self as BundleModule>::load(self, ctx, name)
+//     }
+// }
+
+// impl Resolver for Box<dyn BundleModule> {
+//     fn resolve<'js>(&mut self, ctx: Ctx<'js>, base: &str, name: &str) -> Result<String> {
+//         <Self as BundleModule>::resolve(self, ctx, base, name)
+//     }
+// }
+
+struct BundleModuleImpl<T>(T);
+
+impl<T> BundleModule for BundleModuleImpl<T>
+where
+    T: Loader + Resolver,
+{
+    fn load<'js>(
+        &mut self,
+        ctx: Ctx<'js>,
+        name: &str,
+    ) -> Result<rquickjs::Module<'js, rquickjs::Loaded<()>>> {
+        self.0.load(ctx, name)
+    }
+
+    fn resolve<'js>(&mut self, ctx: Ctx<'js>, base: &str, name: &str) -> Result<String> {
+        self.0.resolve(ctx, base, name)
+    }
+}
+
+#[derive(Clone)]
+struct BundleModuleCol(Rc<RefCell<Vec<Box<dyn BundleModule>>>>);
+
+impl Loader for BundleModuleCol {
+    fn load<'js>(
+        &mut self,
+        ctx: Ctx<'js>,
+        name: &str,
+    ) -> Result<rquickjs::Module<'js, rquickjs::Loaded<()>>> {
+        let mut last = None;
+        for next in self.0.borrow_mut().iter_mut() {
+            last = match next.load(ctx, name) {
+                Ok(ret) => return Ok(ret),
+                Err(err) => Some(err),
+            };
+        }
+
+        Err(last.unwrap_or(rquickjs::Error::new_loading(name)))
+    }
+}
+
+impl Resolver for BundleModuleCol {
+    fn resolve<'js>(&mut self, ctx: Ctx<'js>, base: &str, name: &str) -> Result<String> {
+        let mut last = None;
+        for next in self.0.borrow_mut().iter_mut() {
+            last = match next.resolve(ctx, base, name) {
+                Ok(ret) => return Ok(ret),
+                Err(err) => Some(err),
+            };
+        }
+
+        Err(last.unwrap_or(rquickjs::Error::new_resolving(base, name)))
+    }
+}
+//
+
 #[derive(Default)]
 pub struct VmBuilder {
     modules: Vec<Box<dyn UserModule>>,
+    bundles: Vec<Box<dyn BundleModule>>,
     cwd: Option<PathBuf>,
 }
 
@@ -75,6 +175,14 @@ impl VmBuilder {
         M::UserModule: 'static,
     {
         self.modules.push(Box::new(module.into_module()));
+        self
+    }
+
+    pub fn add_bundle<T>(&mut self, bundle: T) -> &mut Self
+    where
+        T: Loader + Resolver + 'static,
+    {
+        self.bundles.push(Box::new(BundleModuleImpl(bundle)));
         self
     }
 
@@ -117,10 +225,15 @@ impl VmBuilder {
 
         rt.spawn_executor(rquickjs::Tokio);
 
-        rt.set_loader(
-            (resolver, UTIL, PIPE, TASKS, script_resolver),
-            (loader, UTIL, PIPE, TASKS, script_loader),
-        );
+        let resolver = (resolver, UTIL, PIPE, TASKS, script_resolver);
+        let loader = (loader, UTIL, PIPE, TASKS, script_loader);
+
+        if !self.bundles.is_empty() {
+            let col = BundleModuleCol(Rc::new(RefCell::new(self.bundles)));
+            rt.set_loader((resolver, col.clone()), (loader, col.clone()));
+        } else {
+            rt.set_loader(resolver, loader);
+        }
 
         ctx.with(|ctx| crate::global::init(ctx))?;
 
