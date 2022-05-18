@@ -4,8 +4,8 @@ use std::{
 };
 
 use rquickjs::{
-    BuiltinResolver, Bundle, Context, Ctx, FileResolver, Func, Function, Loader, ModuleDef,
-    ModuleLoader, Promise, Resolver, Result, Runtime, ScriptLoader,
+    AsArguments, BuiltinResolver, Bundle, Context, Ctx, FileResolver, Func, Function, IntoJs,
+    Loader, ModuleDef, ModuleLoader, Promise, Resolver, Result, Runtime, ScriptLoader,
 };
 
 #[cfg(feature = "os")]
@@ -188,7 +188,10 @@ impl Vm {
     //     ((resolver, script_resolver), (loader, script_loader))
     // }
 
-    pub async fn run_main(mut self, path: impl AsRef<Path>) -> Result<()> {
+    pub async fn run_main<A>(mut self, path: impl AsRef<Path>, args: A) -> Result<()>
+    where
+        for<'js> A: IntoJs<'js>,
+    {
         let handle = self.rt.spawn_executor(rquickjs::Tokio);
 
         let idle = self.rt.idle();
@@ -218,12 +221,12 @@ impl Vm {
                     if #[cfg(not(feature = "os"))] {
                         let module = ctx.compile("main", source)?;
                         let main: Function = module.get("main")?;
-                        main.call::<_, Promise<()>>(())
+                        main.call::<_, Promise<()>>((args,))
                     } else {
                         let module = ctx.compile("main", MAIN)?;
                         let main: Function = module.get("main")?;
                         let path = path.as_ref().to_string_lossy().to_string();
-                        main.call::<_, Promise<()>>((path,))
+                        main.call::<_, Promise<()>>((path, args))
                     }
                 }
             })?
