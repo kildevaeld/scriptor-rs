@@ -230,7 +230,7 @@ impl VmBuilder {
 
         if !self.bundles.is_empty() {
             let col = BundleModuleCol(Rc::new(RefCell::new(self.bundles)));
-            rt.set_loader((resolver, col.clone()), (loader, col.clone()));
+            rt.set_loader((resolver, col.clone()), (col.clone(), loader));
         } else {
             rt.set_loader(resolver, loader);
         }
