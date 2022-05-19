@@ -11,6 +11,10 @@ impl Url {
 
         Ok(Url { url })
     }
+
+    pub fn as_str(&self) -> &str {
+        self.url.as_str()
+    }
 }
 
 impl ToString for Url {
