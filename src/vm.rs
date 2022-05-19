@@ -208,6 +208,8 @@ impl VmBuilder {
             module.register(&mut resolver, &mut loader);
         }
 
+        log::debug!("using cwd: {:?}", cwd);
+
         let mut script_resolver =
             FileResolver::default().with_path(&cwd.as_os_str().to_string_lossy());
 
@@ -215,7 +217,7 @@ impl VmBuilder {
         script_resolver.add_pattern("{}.ts");
 
         #[cfg(not(feature = "typescript"))]
-        let script_loader = ScriptLoader::default();
+        let script_loader = ScriptLoader::default().add;
 
         #[cfg(feature = "typescript")]
         let script_loader = crate::TypescriptFileLoader::default();
