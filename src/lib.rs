@@ -13,6 +13,7 @@ mod process;
 mod stream;
 
 mod bundle;
+mod ext;
 
 #[cfg(feature = "typescript")]
 mod typescript_loader;
@@ -41,6 +42,8 @@ pub use rquickjs::{Error, Result};
 pub(crate) use file_desc::*;
 #[cfg(any(feature = "fs", feature = "os"))]
 pub(crate) use stream::*;
+
+pub use ext::*;
 
 #[allow(unused_mut)]
 pub fn create() -> (impl Resolver, impl Loader) {
