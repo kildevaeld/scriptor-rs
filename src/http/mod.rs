@@ -7,8 +7,10 @@ use rquickjs::{BuiltinResolver, Class, Error, Module as QuickModule, ModuleDef, 
 
 use client::Client;
 use headers::Headers;
-use request::{Request, Url};
+use request::Request;
 use response::Response;
+
+pub use request::Url;
 
 pub struct Module;
 
