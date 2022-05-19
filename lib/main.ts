@@ -18,9 +18,9 @@ export async function main(path: string, arg: unknown) {
 
   try {
     if (typeof module.default === "function") {
-      await enqueueTask(module.default(arg));
+      await module.default(arg);
     } else if (typeof module.main === "function") {
-      await enqueueTask(module.main(arg));
+      await module.main(arg);
     }
     await awaitAllTasks();
   } catch (e) {

@@ -328,4 +328,8 @@ impl Vm {
 
         Ok(())
     }
+
+    pub async fn idle(&self) {
+        self.rt.idle().await;
+    }
 }
