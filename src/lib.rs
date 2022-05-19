@@ -19,6 +19,7 @@ mod ext;
 mod typescript_loader;
 
 use rquickjs::{BuiltinResolver, Loader, ModuleLoader, Resolver};
+
 #[cfg(feature = "typescript")]
 pub use typescript_loader::*;
 
@@ -34,7 +35,7 @@ pub mod os;
 pub use bundle::{PIPE, TASKS, UTIL};
 
 #[cfg(feature = "vm")]
-pub use vm::{Vm, VmBuilder};
+pub use vm::{IntoUserModule, UserModule, UserModuleImpl, Vm, VmBuilder};
 
 pub use rquickjs::{Error, Result};
 
