@@ -210,8 +210,10 @@ impl VmBuilder {
 
         log::debug!("using cwd: {:?}", cwd);
 
-        let mut script_resolver =
-            FileResolver::default().with_path(&cwd.as_os_str().to_string_lossy());
+        let mut script_resolver = FileResolver::default()
+            .with_path(&cwd.as_os_str().to_string_lossy())
+            .with_path("./")
+            .with_native();
 
         #[cfg(feature = "typescript")]
         script_resolver.add_pattern("{}.ts");
