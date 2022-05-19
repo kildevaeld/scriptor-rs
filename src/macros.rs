@@ -335,6 +335,7 @@ macro_rules! reader {
     };
 }
 
+#[macro_export]
 macro_rules! module_def {
     ($name: ident, $ident: ident) => {
         #[cfg(feature = "vm")]
