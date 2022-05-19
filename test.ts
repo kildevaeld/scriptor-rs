@@ -51,6 +51,7 @@ export async function main(greet) {
     .filter((m) => !m.path.endsWith("index.d.ts"))
     .map((m) => readFile(m.path))
     .map((m) => decoder.decode(m))
+
     .join("\n\n");
 
   // console.log(lines);

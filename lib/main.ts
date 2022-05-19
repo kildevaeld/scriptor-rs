@@ -22,7 +22,9 @@ export async function main(path: string, arg: unknown) {
     } else if (typeof module.main === "function") {
       await module.main(arg);
     }
-  } finally {
     await awaitAllTasks();
+  } catch (e) {
+    await awaitAllTasks();
+    throw e;
   }
 }
