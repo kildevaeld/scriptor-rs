@@ -59,6 +59,17 @@ where
     }
 }
 
+impl<M, S> IntoUserModule for UserModuleImpl<M, S>
+where
+    M: ModuleDef,
+    S: AsRef<str>,
+{
+    type UserModule = Self;
+    fn into_module(self) -> Self::UserModule {
+        self
+    }
+}
+
 impl UserModule for Box<dyn UserModule> {
     fn register(&mut self, resolver: &mut BuiltinResolver, loader: &mut ModuleLoader) {
         (**self).register(resolver, loader)
