@@ -1,6 +1,6 @@
 import { createConsole } from "util";
-import { stdout } from "os";
 import { enqueueTask, awaitAllTasks } from "tasks";
+import { stdout } from "os";
 
 const encoder = new TextEncoder();
 

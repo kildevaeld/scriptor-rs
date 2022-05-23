@@ -58,10 +58,11 @@ export async function main(greet) {
 
   await writeFile("scriptor.d.ts", lines);
   // await delay(1000);
-  console.log("done");
+  // console.log("done");
 
-  for (let i = 0; i < 2000; i++) {
+  for (let i = 0; i < 100; i++) {
     console.log("TEST ");
     // delay(10);
   }
+  console.log("done");
 }

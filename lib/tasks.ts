@@ -9,26 +9,31 @@ class Queue {
   push<T>(task: Promise<T>): Promise<T> {
     let id = uniqueKey();
 
+    const tasks = this.tasks;
+
     const out = task.then(
       (resp) => {
-        this.tasks.delete(id);
+        tasks.delete(id);
         return resp;
       },
       (err) => {
-        this.tasks.delete(id);
+        tasks.delete(id);
         throw err;
       }
     );
 
-    this.tasks.set(id, out);
+    tasks.set(id, out);
 
     return out;
   }
 
   async wait() {
-    await delay(60);
+    await delay(16);
+
     while (this.tasks.size > 0) {
-      await Promise.all(Array.from(this.tasks.values()));
+      const tasks = Array.from(this.tasks.values());
+      this.tasks = new Map();
+      await Promise.all(tasks);
     }
   }
 }
