@@ -49,7 +49,6 @@ export function format(input: unknown, quote = false): string {
   if (typeof input === "function") {
     return `[Function ${input.name}]`;
   }
-
   if (isPlainObject(input)) {
     const buf = [];
     for (const key in input) {
@@ -70,15 +69,14 @@ export interface Console {
   warn(...args: unknown[]): void;
 }
 
-function factory(print: (input: string) => void) {
+function factory(echo: (input: string) => void) {
   return (...args: unknown[]) => {
     const out = args
       .map((m) => {
         return format(m);
       })
       .join(" ");
-
-    print(out + "\n");
+    echo(out + "\n");
   };
 }
 
@@ -90,7 +88,7 @@ export function createConsole(
   const stderrFn = stderr ? factory(stderr) : stdoutFn;
 
   return {
-    log: stderrFn,
+    log: stdoutFn,
     warn: stderrFn,
   };
 }
