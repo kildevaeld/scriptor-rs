@@ -67,19 +67,30 @@ export function format(input: unknown, quote = false): string {
 
 export interface Console {
   log(...args: unknown[]): void;
+  warn(...args: unknown[]): void;
 }
 
-export function createConsole(print: (input: string) => void): Console {
-  return {
-    log(...args: unknown[]): void {
-      const out = args
-        .map((m) => {
-          return format(m);
-        })
-        .join(" ");
+function factory(print: (input: string) => void) {
+  return (...args: unknown[]) => {
+    const out = args
+      .map((m) => {
+        return format(m);
+      })
+      .join(" ");
 
-      print(out + "\n");
-      //   print(args.map((m) => format(m)).join(" "));
-    },
+    print(out + "\n");
+  };
+}
+
+export function createConsole(
+  stdout: (input: string) => void,
+  stderr?: (input: string) => void
+): Console {
+  const stdoutFn = factory(stdout);
+  const stderrFn = stderr ? factory(stderr) : stdoutFn;
+
+  return {
+    log: stderrFn,
+    warn: stderrFn,
   };
 }

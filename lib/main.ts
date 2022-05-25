@@ -1,13 +1,17 @@
 import { createConsole } from "util";
 import { enqueueTask, awaitAllTasks } from "tasks";
-import { stdout } from "os";
+import { stdout, stderr } from "os";
 
 const encoder = new TextEncoder();
 
-globalThis.console = createConsole((arg) => {
-  const p = stdout.write(encoder.encode(arg));
-  enqueueTask(p);
-});
+globalThis.console = createConsole(
+  (arg) => {
+    enqueueTask(stdout.write(encoder.encode(arg)));
+  },
+  (arg) => {
+    enqueueTask(stderr.write(encoder.encode(arg)));
+  }
+);
 
 export async function main(path: string, arg: unknown) {
   const module = await import(path);

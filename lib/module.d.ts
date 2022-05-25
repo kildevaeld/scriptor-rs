@@ -4,6 +4,7 @@ declare module "os" {
   }
 
   export const stdout: Write;
+  export const stderr: Write;
 }
 
 declare function delay(n: number): Promise<void>;

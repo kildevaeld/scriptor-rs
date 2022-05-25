@@ -8,5 +8,8 @@ declare module "util" {
     log(...args: unknown[]);
   }
 
-  export function createConsole(print: (arg: string) => void): ConsoleApi;
+  export function createConsole(
+    stdout: (arg: string) => void,
+    stderr?: (arg: string) => void
+  ): ConsoleApi;
 }
