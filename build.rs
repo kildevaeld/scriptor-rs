@@ -44,7 +44,7 @@ pub fn compile_jsx(path: &str) -> String {
             &handler,
             &Options {
                 config: swc::config::Config {
-                    minify: true,
+                    minify: true.into(),
 
                     jsc: JscConfig {
                         target: Some(EsVersion::Es2020),
@@ -55,7 +55,7 @@ pub fn compile_jsx(path: &str) -> String {
                                 ..Default::default()
                             },
                         )),
-                        external_helpers: false,
+                        external_helpers: false.into(),
                         ..Default::default()
                     },
                     ..Default::default()

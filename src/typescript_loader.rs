@@ -60,7 +60,7 @@ impl Loader for TypescriptFileLoader {
                     config: swc::config::Config {
                         jsc: JscConfig {
                             target: EsVersion::Es2017.into(),
-                            external_helpers: false,
+                            external_helpers: false.into(),
                             syntax: Some(swc_ecma_parser::Syntax::Typescript(
                                 swc_ecma_parser::TsConfig {
                                     tsx: true,
@@ -107,7 +107,7 @@ pub fn compile(name: &str, source: impl ToString) -> Result<String, Error> {
                 config: swc::config::Config {
                     jsc: JscConfig {
                         target: EsVersion::Es2017.into(),
-                        external_helpers: false,
+                        external_helpers: false.into(),
                         syntax: Some(swc_ecma_parser::Syntax::Typescript(
                             swc_ecma_parser::TsConfig {
                                 tsx: true,

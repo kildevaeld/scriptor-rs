@@ -44,15 +44,14 @@ pin-project-lite = "0.2"
 log = "0.4"
 
 # Typescript
-swc = {version = "0.174.0", optional = true}
-swc_common = {version = "0.17.24", features = ["tty-emitter"], optional = true}
-swc_ecma_parser = {version = "0.102.13", optional = true}
+swc = {version = "0.188.0", optional = true}
+swc_common = {version = "0.18.9", features = ["tty-emitter"], optional = true}
+swc_ecma_parser = {version = "0.105.3", optional = true}
 
 [dev-dependencies]
 tokio = {version = "1", features = ["sync", "io-util", "rt", "macros"]}
 
 [build-dependencies]
-# Typescript
-swc = {version = "0.174.0"}
-swc_common = {version = "0.17.24", features = ["tty-emitter"]}
-swc_ecma_parser = {version = "0.102.13"}
+swc = {version = "0.188.0"}
+swc_common = {version = "0.18.9", features = ["tty-emitter"]}
+swc_ecma_parser = {version = "0.105.3"}
