@@ -19,6 +19,8 @@ declare module "fs" {
     [Symbol.asyncIterator](): AsyncIterator<DirEntry>;
   }
 
+  export function open(path: string, mode: string): Promise<File>;
+
   export function open(path: string): Promise<File>;
 
   export function readDir(path: string): Promise<ReadDir>;

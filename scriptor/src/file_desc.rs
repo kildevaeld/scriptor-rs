@@ -77,6 +77,15 @@ impl<F: AsyncWrite + std::marker::Unpin + Send + 'static + Sync> FileDesc<F> {
         })
     }
 
+    pub fn write_str(&mut self, data: String) -> BoxFuture<'static, Result<()>> {
+        let file = self.file.clone();
+
+        Box::pin(async move {
+            let mut file = file.write().await;
+            file.write_all(data.as_bytes()).await.map_err(throw!())
+        })
+    }
+
     pub fn flush(&mut self) -> BoxFuture<'static, Result<()>> {
         let file = self.file.clone();
         Box::pin(async move {

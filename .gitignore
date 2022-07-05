@@ -1,3 +1,5 @@
 /target
 /Cargo.lock
 scriptor.d.ts
+
+scriptor-root

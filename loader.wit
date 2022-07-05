@@ -1,0 +1,8 @@
+
+variant compilation {
+    success(string),
+    failure(string)
+}
+
+transform: func(input: string) -> compilation
+extension: func() -> list<string>

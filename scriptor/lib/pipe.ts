@@ -26,6 +26,13 @@ export class Pipe<T> {
     return this as unknown as Pipe<R>;
   }
 
+  async forEach(fn: (item: T, idx: number) => void): Promise<void> {
+    let enumerator = 0;
+    for await (const next of this._stream) {
+      fn(next, enumerator++);
+    }
+  }
+
   flat(): Pipe<FlatAsyncIterator<T, 1>> {
     this._stream = flatten(this._stream);
     return this as any;

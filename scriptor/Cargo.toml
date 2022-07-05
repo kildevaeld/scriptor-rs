@@ -1,0 +1,60 @@
+[package]
+edition = "2021"
+name = "scriptor"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = []
+
+full = [
+  "fs",
+  "os",
+  "http",
+  "vm",
+  "wasm",
+]
+
+fs = ["tokio/fs"]
+http = ["reqwest"]
+os = ["tokio/io-std"]
+vm = ["tokio/fs"]
+
+wasm = ["wasmtime", "wasmtime-wasi", "wit-bindgen-wasmtime", "anyhow", "tokio/fs"]
+
+# typescript = ["swc", "swc_common", "swc_ecma_parser"]
+
+[[example]]
+name = "scriptor"
+path = "examples/scriptor.rs"
+required-features = ["full"]
+
+[dependencies]
+rquickjs = {version = "0.1", features = ["tokio", "macro", "futures", "loader", "array-buffer"]}
+
+tokio = {version = "1", features = ["sync", "io-util"]}
+tokio-stream = {version = "0.1", features = ["io-util"]}
+
+reqwest = {version = "0.11", optional = true}
+
+futures-core = "0.3"
+futures-lite = "1"
+
+cfg-if = "1"
+pin-project-lite = "0.2"
+
+log = "0.4"
+
+anyhow = {version = "1", optional = true}
+wasmtime = {version = "0.38", optional = true}
+wasmtime-wasi = {version = "0.38", optional = true}
+wit-bindgen-wasmtime = {git = "https://github.com/bytecodealliance/wit-bindgen", optional = true}
+
+[dev-dependencies]
+tokio = {version = "1", features = ["sync", "io-util", "rt", "macros"]}
+
+[build-dependencies]
+swc = {version = "0.188.0"}
+swc_common = {version = "0.18.9", features = ["tty-emitter"]}
+swc_ecma_parser = {version = "0.105.3"}

@@ -10,9 +10,6 @@ pub struct DirEntry {
 class_def! {
     DirEntry
     (proto) {
-        // proto.prop("path", Accessor::from(Method(|this: &DirEntry| {
-        //     this.entry.path().as_os_str().to_string_lossy().to_string()
-        // })))?;
 
         proto.prop("path", Accessor::from(Method(|this: &DirEntry| {
             this.entry.path().as_os_str().to_string_lossy().to_string()

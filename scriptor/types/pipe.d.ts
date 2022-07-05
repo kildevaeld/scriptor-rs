@@ -11,6 +11,7 @@ declare module "pipe" {
     constructor(stream: AsyncIterable<T>);
     filter(filterFn: (item: T) => Result<boolean>): this;
     map<R>(mapFn: (item: T) => Result<R>): Pipe<R>;
+    forEach(mapFn: (item: T) => void): Promise<void>;
     flat(): Pipe<FlatAsyncIterator<T, 1>>;
     collect(): Promise<T[]>;
     fold<R>(acc: (prev: R, cur: T) => Result<R>, init: R): Promise<R>;

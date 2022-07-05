@@ -132,10 +132,15 @@ macro_rules! readwriter {
                     "lines",
                     Func::from(Method($crate::FileDesc::<$file>::lines)),
                 )?;
+
                 proto.set(
                     "write",
-                    Func::from(Async(Method($crate::FileDesc::<$file>::write))),
+                    Func::from((
+                        Async(Method($crate::FileDesc::<$file>::write)),
+                        Async(Method($crate::FileDesc::<$file>::write_str)),
+                    )),
                 )?;
+
                 proto.set(
                     "flush",
                     Func::from(Async(Method($crate::FileDesc::<$file>::flush))),
@@ -339,10 +344,10 @@ macro_rules! reader {
 macro_rules! module_def {
     ($name: ident, $ident: ident) => {
         #[cfg(feature = "vm")]
-        impl $crate::vm::IntoUserModule for $ident {
-            type UserModule = $crate::vm::UserModuleImpl<$ident, &'static str>;
+        impl $crate::user_module::IntoUserModule for $ident {
+            type UserModule = $crate::user_module::UserModuleImpl<$ident, &'static str>;
             fn into_module(self) -> Self::UserModule {
-                $crate::vm::UserModuleImpl::new(stringify!($name), self)
+                $crate::user_module::UserModuleImpl::new(stringify!($name), self)
             }
         }
     };

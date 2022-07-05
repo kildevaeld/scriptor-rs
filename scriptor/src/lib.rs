@@ -14,14 +14,18 @@ mod stream;
 
 mod bundle;
 mod ext;
+mod utils;
 
-#[cfg(feature = "typescript")]
-mod typescript_loader;
+mod bundle_module;
+mod user_module;
+
+// #[cfg(feature = "typescript")]
+// mod typescript_loader;
 
 use rquickjs::{BuiltinResolver, Loader, ModuleLoader, Resolver};
 
-#[cfg(feature = "typescript")]
-pub use typescript_loader::*;
+// #[cfg(feature = "typescript")]
+// pub use typescript_loader::*;
 
 #[cfg(feature = "http")]
 pub mod http;
@@ -35,9 +39,11 @@ pub mod os;
 pub use bundle::{PIPE, TASKS, UTIL};
 
 #[cfg(feature = "vm")]
-pub use vm::{IntoUserModule, UserModule, UserModuleImpl, Vm, VmBuilder};
+pub use vm::{Vm, VmBuilder};
 
 pub use rquickjs::{Error, Result};
+
+pub use user_module::{IntoUserModule, UserModule, UserModuleImpl};
 
 #[cfg(any(feature = "fs", feature = "os"))]
 pub(crate) use file_desc::*;
@@ -45,6 +51,9 @@ pub(crate) use file_desc::*;
 pub(crate) use stream::*;
 
 pub use ext::*;
+
+#[cfg(feature = "wasm")]
+pub mod wasm_loader;
 
 #[allow(unused_mut)]
 pub fn create() -> (impl Resolver, impl Loader) {
