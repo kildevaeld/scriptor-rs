@@ -31,8 +31,8 @@ pub struct DirConfig {
 
 #[derive(Default)]
 pub struct VmBuilder {
-    modules: Vec<Box<dyn UserModule>>,
-    bundles: Vec<Box<dyn BundleModule>>,
+    modules: Vec<Box<dyn UserModule + Send>>,
+    bundles: Vec<Box<dyn BundleModule + Send>>,
     cwd: Option<PathBuf>,
     root: Option<PathBuf>,
 }
@@ -40,13 +40,13 @@ pub struct VmBuilder {
 impl VmBuilder {
     pub fn add_module<M: IntoUserModule>(&mut self, module: M) -> &mut Self
     where
-        M::UserModule: 'static,
+        M::UserModule: 'static + Send,
     {
         self.modules.push(Box::new(module.into_module()));
         self
     }
 
-    pub fn add_bundle<T>(&mut self, bundle: T) -> &mut Self
+    pub fn add_bundle<T: Send>(&mut self, bundle: T) -> &mut Self
     where
         T: Loader + Resolver + 'static,
     {

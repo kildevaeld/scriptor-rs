@@ -62,7 +62,7 @@ where
 }
 
 #[derive(Clone)]
-pub(crate) struct BundleModuleCol(pub(crate) Rc<RefCell<Vec<Box<dyn BundleModule>>>>);
+pub(crate) struct BundleModuleCol(pub(crate) Rc<RefCell<Vec<Box<dyn BundleModule + Send>>>>);
 
 impl Loader for BundleModuleCol {
     fn load<'js>(
