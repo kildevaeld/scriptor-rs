@@ -10,7 +10,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
             builder
                 .cwd(".")
-                .root("scriptor-root")
+                // .root("scriptor-root")
                 .add_module(scriptor::fs::Module)
                 .add_module(scriptor::os::Module)
                 .add_module(scriptor::http::Module);

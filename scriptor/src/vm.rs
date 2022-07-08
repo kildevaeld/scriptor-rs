@@ -1,6 +1,7 @@
 use rquickjs::{
     BuiltinLoader, BuiltinResolver, Bundle, Context, Ctx, FileResolver, Function, IntoJs, Loader,
-    ModuleDef, ModuleLoader, Promise, Resolver, Result, Runtime, Script, ScriptLoader,
+    ModuleDef, ModuleLoader, NativeLoader, Promise, Resolver, Result, Runtime, Script,
+    ScriptLoader,
 };
 use std::{
     cell::RefCell,
@@ -8,8 +9,6 @@ use std::{
     rc::Rc,
     time::Duration,
 };
-
-use futures_lite::StreamExt;
 
 #[cfg(feature = "os")]
 static MAIN: &'static str = include_str!("../lib/main.js");
@@ -24,6 +23,11 @@ use crate::{
 use crate::wasm_loader::{open_path, WasmConfig, WasmLoaders};
 
 use super::bundle::*;
+
+pub struct DirConfig {
+    cache: PathBuf,
+    config: PathBuf,
+}
 
 #[derive(Default)]
 pub struct VmBuilder {
@@ -64,12 +68,12 @@ impl VmBuilder {
         self.build_with(|_| Ok(())).await
     }
 
-    async fn ensure_root(path: &Path) -> std::io::Result<()> {
-        if !path.exists() {
-            tokio::fs::create_dir_all(path).await?;
+    async fn ensure_root(cfg: &DirConfig) -> std::io::Result<()> {
+        if !cfg.cache.exists() {
+            tokio::fs::create_dir_all(&cfg.cache).await?;
         }
 
-        let loaders = path.join("loaders");
+        let loaders = cfg.config.join("loaders");
         if !loaders.exists() {
             tokio::fs::create_dir_all(loaders).await?;
         }
@@ -78,20 +82,13 @@ impl VmBuilder {
     }
 
     #[cfg(feature = "wasm")]
-    async fn get_wasm_loader(root: Option<PathBuf>) -> anyhow::Result<Option<WasmLoaders>> {
-        let root = match &root {
-            Some(root) => root,
-            None => return Ok(None),
-        };
-
-        VmBuilder::ensure_root(root).await?;
-
-        let loaders = root.join("loaders");
-        let cache = root.join("cache");
+    async fn get_wasm_loader(root: &DirConfig) -> anyhow::Result<Option<WasmLoaders>> {
+        let loaders = root.config.join("loaders");
 
         let loader = open_path(WasmConfig {
             loaders: &loaders,
-            cache: Some(&cache),
+            config: &root.config,
+            cache: Some(&root.cache),
         })
         .await?;
 
@@ -103,6 +100,28 @@ impl VmBuilder {
         root: Option<PathBuf>,
     ) -> std::result::Result<Option<BuiltinLoader>, std::convert::Infallible> {
         Ok(None)
+    }
+
+    async fn get_dir_config(root: Option<PathBuf>) -> std::io::Result<DirConfig> {
+        let root = match root {
+            Some(root) => DirConfig {
+                cache: root.join("cache"),
+                config: root,
+            },
+            None => {
+                let dirs =
+                    directories::ProjectDirs::from("com", "Smalltalk", "scriptor").expect("path");
+
+                DirConfig {
+                    cache: dirs.cache_dir().to_path_buf(),
+                    config: dirs.config_dir().to_path_buf(),
+                }
+            }
+        };
+
+        VmBuilder::ensure_root(&root).await?;
+
+        Ok(root)
     }
 
     pub async fn build_with<F: FnMut(Ctx<'_>) -> Result<()> + 'static>(
@@ -123,15 +142,15 @@ impl VmBuilder {
 
         log::debug!("using cwd: {:?}", cwd);
 
-        #[allow(unused_mut)]
         let mut script_resolver = FileResolver::default()
             .with_path(&cwd.as_os_str().to_string_lossy())
-            .with_path("./")
             .with_native();
 
         let script_loader = ScriptLoader::default();
 
-        let wasm_loader = VmBuilder::get_wasm_loader(self.root)
+        let dir_cfg = VmBuilder::get_dir_config(self.root).await?;
+
+        let wasm_loader = VmBuilder::get_wasm_loader(&dir_cfg)
             .await
             .map_err(throw!())?;
 
@@ -143,8 +162,7 @@ impl VmBuilder {
                 script_resolver.add_pattern(string);
             }
         }
-        // #[cfg(feature = "typescript")]
-        // let script_loader = crate::TypescriptFileLoader::default();
+
         let rt = Runtime::new()?;
         let ctx = Context::full(&rt)?;
 
@@ -152,8 +170,23 @@ impl VmBuilder {
 
         let resolver = (resolver, UTIL, PIPE, TASKS, script_resolver);
         let loader = match wasm_loader {
-            Some(wasm) => Either::Left((loader, UTIL, PIPE, TASKS, wasm, script_loader)),
-            None => Either::Right((loader, UTIL, PIPE, TASKS, script_loader)),
+            Some(wasm) => Either::Left((
+                loader,
+                UTIL,
+                PIPE,
+                TASKS,
+                wasm,
+                script_loader,
+                NativeLoader::default(),
+            )),
+            None => Either::Right((
+                loader,
+                UTIL,
+                PIPE,
+                TASKS,
+                script_loader,
+                NativeLoader::default(),
+            )),
         };
 
         if !self.bundles.is_empty() {
@@ -167,18 +200,27 @@ impl VmBuilder {
 
         ctx.with(config)?;
 
-        Ok(Vm { rt, ctx })
+        Ok(Vm {
+            rt,
+            ctx,
+            dirs: dir_cfg,
+        })
     }
 }
 
 pub struct Vm {
     rt: Runtime,
     ctx: Context,
+    dirs: DirConfig,
 }
 
 impl Vm {
     pub fn build() -> VmBuilder {
         VmBuilder::default()
+    }
+
+    pub fn config(&self) -> &DirConfig {
+        &self.dirs
     }
 
     pub async fn new(work_path: impl AsRef<Path>) -> Result<Vm> {

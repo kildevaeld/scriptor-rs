@@ -27,7 +27,9 @@ impl WasmLoader {
 
         let output = match output {
             loader::Compilation::Success(ret) => ret,
-            loader::Compilation::Failure(err) => return Err(throw!(err)),
+            loader::Compilation::Failure(err) => {
+                return Err(rquickjs::Error::new_loading_message(path, err))
+            }
         };
 
         Ok(JsModule::new(ctx, path, output)?.into_loaded())
@@ -115,7 +117,6 @@ fn instantiate<I: Default, E: Default, T>(
 
 pub fn open<P: AsRef<Path>>(engine: Engine, path: P) -> anyhow::Result<WasmLoader> {
     use loader::*;
-    println!("opening");
     let (exports, mut store) = instantiate(
         &engine,
         path,
@@ -134,6 +135,7 @@ pub fn open<P: AsRef<Path>>(engine: Engine, path: P) -> anyhow::Result<WasmLoade
 
 pub struct WasmConfig<'a> {
     pub loaders: &'a Path,
+    pub config: &'a Path,
     pub cache: Option<&'a Path>,
 }
 
@@ -244,7 +246,7 @@ impl Loader for WasmLoaders {
         {
             match loader.load(ctx, p) {
                 Ok(ret) => return Ok(ret),
-                Err(_) => continue,
+                Err(err) => return Err(err),
             }
         }
 
