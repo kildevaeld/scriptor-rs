@@ -157,7 +157,7 @@ pub async fn ensure_cache_config(root: impl AsRef<Path>) -> anyhow::Result<PathB
 [cache]
 enabled = true
 directory = {:?}
-cleanup-interval = "30m"
+cleanup-interval = "1d"
 files-total-size-soft-limit = "1Gi"
 "#,
             cache_path

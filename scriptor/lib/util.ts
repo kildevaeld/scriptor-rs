@@ -42,6 +42,8 @@ export function format(input: unknown, quote = false): string {
 
   if (typeof input == "number") return input + "";
 
+  if (typeof input == "boolean") return input + "";
+
   if (Array.isArray(input)) {
     return `[ ${input.map((m) => format(m, true)).join(", ")} ]`;
   }
