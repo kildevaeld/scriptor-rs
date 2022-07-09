@@ -36,7 +36,7 @@ pub mod fs;
 #[cfg(feature = "os")]
 pub mod os;
 
-mod vm_worker;
+// mod vm_worker;
 
 pub use bundle::{PIPE, TASKS, UTIL};
 
