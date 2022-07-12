@@ -21,7 +21,7 @@ http = ["reqwest"]
 os = ["tokio/io-std"]
 vm = ["tokio/fs"]
 
-wasm = ["wasmtime", "wasmtime-wasi", "wit-bindgen-wasmtime", "anyhow", "tokio/fs", "directories"]
+wasm = ["wasmtime", "wasmtime-wasi", "wit-bindgen-wasmtime", "anyhow", "tokio/fs"]
 
 # typescript = ["swc", "swc_common", "swc_ecma_parser"]
 
@@ -47,7 +47,7 @@ pin-project-lite = "0.2"
 log = "0.4"
 
 anyhow = {version = "1", optional = true}
-directories = {version = "4", optional = true}
+directories = {version = "4"}
 wasmtime = {version = "0.38", optional = true}
 wasmtime-wasi = {version = "0.38", optional = true}
 wit-bindgen-wasmtime = {git = "https://github.com/bytecodealliance/wit-bindgen", optional = true}
