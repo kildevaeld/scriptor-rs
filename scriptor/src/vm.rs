@@ -97,7 +97,7 @@ impl VmBuilder {
 
     #[cfg(not(feature = "wasm"))]
     async fn get_wasm_loader(
-        root: Option<PathBuf>,
+        root: &DirConfig,
     ) -> std::result::Result<Option<BuiltinLoader>, std::convert::Infallible> {
         Ok(None)
     }
