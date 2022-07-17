@@ -1,4 +1,16 @@
-use rquickjs::{BuiltinResolver, ModuleDef, ModuleLoader};
+use rquickjs::{
+    BuiltinResolver, Bundle, Ctx, Loader, Module, ModuleDef, ModuleLoader, Resolver, Result,
+};
+
+pub trait ModuleLoader2 {
+    fn load<'js>(
+        &mut self,
+        ctx: Ctx<'js>,
+        name: &str,
+    ) -> Result<rquickjs::Module<'js, rquickjs::Loaded<()>>>;
+
+    fn resolve<'js>(&mut self, ctx: Ctx<'js>, base: &str, name: &str) -> Result<String>;
+}
 
 pub trait UserModule {
     fn register(&mut self, resolver: &mut BuiltinResolver, loader: &mut ModuleLoader);

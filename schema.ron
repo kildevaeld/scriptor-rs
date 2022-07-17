@@ -1,0 +1,119 @@
+[
+    Entity(
+        name: "User",
+        columns: [
+            (
+                name: "id",
+                type: Auto,
+                primary: true,
+            ),
+            (
+                name: "name",
+                type: Text,
+                required: true
+            ),
+            (
+                name: "email",
+                type: Text,
+            ),
+            (
+                name: "passwd",
+                type: Binary,
+            ),
+        ],
+        relations: [
+            (
+                name: "todos",
+                target: "Todo",
+                inverse: Some("user"),
+                type: OneToMany,
+            ),
+        ],
+        indices: [
+            
+        ],
+        uniques: [
+            (
+                name: Some("user_email_idx"),
+                columns: ["email"],
+            )
+        ],
+    ),
+    Entity(
+        name: "Todo",
+        columns: [
+            (
+                name: "id",
+                type: Auto,
+                primary: true
+            ),
+            (
+                name: "name",
+                type: Text,
+            ),
+            (
+                name: "description",
+                type: Text,
+                required: false
+            ),
+            (
+                name: "completed",
+                type: DateTime,
+                required: false,
+            )
+        ],
+        relations: [
+            (
+                name: "user",
+                target: "User",
+                inverse: Some("todos"),
+                type: ManyToOne(required: true),
+            ),
+            (
+                name: "tags",
+                target: "Tag",
+                inverse: Some("todos"),
+                type: ManyToMany(
+                    via: "TodoTags"
+                ),
+            ),
+           
+        ],
+        indices: [
+            (
+                name: Some("todo_name_idx"),
+                columns: ["name"]
+            )
+        ]
+    ),
+    Entity(
+        name: "Tag",
+        columns: [
+            (
+                name: "id",
+                type: Auto,
+                primary: true,
+            ),
+            (
+                name: "name",
+                type: Text
+            )
+        ],
+        relations: [
+           (
+                name: "todos",
+                target: "Todo",
+                inverse: Some("tags"),
+                type: ManyToMany(
+                    via: "TodoTags"
+                ),
+            ),
+        ],
+        indices: [
+            (
+                name: Some("tag_name_idx"),
+                columns: ["name"]
+            )
+        ]
+    )
+]

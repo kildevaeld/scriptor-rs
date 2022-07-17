@@ -1,6 +1,10 @@
 #[macro_use]
 mod macros;
 
+pub mod esm_modules;
+
+pub use esm_modules as esm;
+
 #[cfg(feature = "vm")]
 mod vm;
 
@@ -12,7 +16,7 @@ mod process;
 #[cfg(any(feature = "fs", feature = "os"))]
 mod stream;
 
-mod bundle;
+pub mod bundle;
 mod ext;
 mod utils;
 

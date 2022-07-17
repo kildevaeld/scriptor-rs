@@ -9,7 +9,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             let mut builder = VmBuilder::default();
 
             builder
-                .cwd(".")
+                .cwd("./scriptor/examples")
                 // .root("scriptor-root")
                 .add_module(scriptor::fs::Module)
                 .add_module(scriptor::os::Module)
