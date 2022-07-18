@@ -1,17 +1,17 @@
-import { createConsole } from "util";
-import { enqueueTask, awaitAllTasks } from "tasks";
-import { stdout, stderr } from "os";
+// import { createConsole } from "util";
+// import { enqueueTask, awaitAllTasks } from "tasks";
+// import { stdout, stderr } from "os";
 
-const encoder = new TextEncoder();
+// const encoder = new TextEncoder();
 
-globalThis.console = createConsole(
-  (arg) => {
-    enqueueTask(stdout.write(encoder.encode(arg)));
-  },
-  (arg) => {
-    enqueueTask(stderr.write(encoder.encode(arg)));
-  }
-);
+// globalThis.console = createConsole(
+//   (arg) => {
+//     enqueueTask(stdout.write(encoder.encode(arg)));
+//   },
+//   (arg) => {
+//     enqueueTask(stderr.write(encoder.encode(arg)));
+//   }
+// );
 
 export async function main(path: string, arg: unknown) {
   const module = await import(path);
@@ -26,9 +26,9 @@ export async function main(path: string, arg: unknown) {
     } else if (typeof module.main === "function") {
       await module.main(arg);
     }
-    await awaitAllTasks();
+    // await awaitAllTasks();
   } catch (e) {
-    await awaitAllTasks();
+    // await awaitAllTasks();
     throw e;
   }
 }

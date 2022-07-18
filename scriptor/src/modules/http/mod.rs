@@ -3,7 +3,7 @@ mod headers;
 mod request;
 mod response;
 
-use rquickjs::{BuiltinResolver, Class, Error, Module as QuickModule, ModuleDef, ModuleLoader};
+use rquickjs::{Class, Error, Module as QuickModule, ModuleDef};
 
 use client::Client;
 use headers::Headers;
@@ -11,6 +11,8 @@ use request::Request;
 use response::Response;
 
 pub use request::Url;
+
+use crate::esm::NativeModule;
 
 pub struct Module;
 
@@ -81,9 +83,4 @@ impl ModuleDef for Module {
     }
 }
 
-module_def!(http, Module);
-
-pub fn init(resolver: &mut BuiltinResolver, loader: &mut ModuleLoader) {
-    resolver.add_module("http");
-    loader.add_module("http", Module);
-}
+pub const HTTP: NativeModule<Module, &'static str> = NativeModule::new("http");

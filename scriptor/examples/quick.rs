@@ -1,5 +1,5 @@
-use rquickjs::{Context, Loader, Resolver, Runtime};
-use scriptor::{bundle, esm, wasm};
+use rquickjs::{Context, Runtime};
+use scriptor::{esm, global, modules, wasm};
 
 fn main() -> anyhow::Result<()> {
     let rt = Runtime::new()?;
@@ -7,7 +7,7 @@ fn main() -> anyhow::Result<()> {
 
     esm::EsmModulesBuilder::default()
         .with_cwd("./scriptor/examples")
-        .with_module(bundle::UTIL)
+        .with_module(modules::UTIL)
         .with_loader(esm::ScriptLoader::default())
         .with_loader(wasm::WasmPluginLoader::new("./target/wasm32-wasi/release")?)
         .register(&rt)?;
@@ -19,7 +19,9 @@ fn main() -> anyhow::Result<()> {
                 //
                 println!("{}", v);
             }),
-        )
+        )?;
+
+        global::init(ctx)
     })?;
 
     ctx.with(|ctx| {

@@ -1,7 +1,7 @@
 mod file;
 mod read_dir;
 
-use crate::{runtime::JsStream, FileDesc};
+use crate::{esm::NativeModule, runtime::JsStream, FileDesc};
 use rquickjs::{Async, Class, Func, ModuleDef, Result};
 
 use self::read_dir::{DirEntry, ReadDir};
@@ -105,4 +105,4 @@ impl ModuleDef for Module {
     }
 }
 
-module_def!(fs, Module);
+pub const FS: NativeModule<Module, &'static str> = NativeModule::new("fs");

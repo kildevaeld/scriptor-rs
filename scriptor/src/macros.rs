@@ -339,16 +339,3 @@ macro_rules! reader {
         }
     };
 }
-
-#[macro_export]
-macro_rules! module_def {
-    ($name: ident, $ident: ident) => {
-        #[cfg(feature = "vm")]
-        impl $crate::esm::IntoEsmModule for $ident {
-            type Module = $crate::esm::NativeModule<$ident, &'static str>;
-            fn into_module(self) -> Self::Module {
-                $crate::esm::NativeModule::new(stringify!($name))
-            }
-        }
-    };
-}

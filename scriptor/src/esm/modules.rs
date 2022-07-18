@@ -1,6 +1,6 @@
 use super::{EsmLoader, EsmModule};
 use relative_path::RelativePath;
-use rquickjs::{Ctx, Error, Loader, Module, Resolver, Result, Runtime};
+use rquickjs::{Ctx, Error, Loader, Resolver, Result, Runtime};
 use std::fs::canonicalize;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -10,7 +10,6 @@ pub struct EsmModulesBuilder {
     modules: Vec<Box<dyn EsmModule>>,
     cwd: Option<PathBuf>,
     loaders: Vec<Box<dyn EsmLoader>>,
-    extensions: Vec<String>,
 }
 
 impl EsmModulesBuilder {

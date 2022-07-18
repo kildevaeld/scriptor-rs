@@ -1,6 +1,9 @@
 use rquickjs::{Class, Func, ModuleDef};
 
-use crate::runtime::{FileDesc, Named};
+use crate::{
+    esm::NativeModule,
+    runtime::{FileDesc, Named},
+};
 
 impl Named for tokio::io::Stdout {
     const NAME: &'static str = "Stdout";
@@ -57,4 +60,4 @@ impl ModuleDef for Module {
     }
 }
 
-module_def!(os, Module);
+pub const OS: NativeModule<Module, &'static str> = NativeModule::new("os");

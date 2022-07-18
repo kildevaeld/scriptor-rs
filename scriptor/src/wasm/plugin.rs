@@ -22,11 +22,10 @@ impl WasmLoaderPlugin {
         path: &Path,
         source: &[u8],
     ) -> rquickjs::Result<rquickjs::Module<'js, rquickjs::Loaded<()>>> {
-        let source = std::fs::read_to_string(path)?;
         let mut store = self.store.lock().unwrap();
         let output = self
             .exports
-            .transform(&mut *store, source.as_bytes())
+            .transform(&mut *store, source)
             .map_err(throw!())?;
 
         let output = match output {
@@ -79,7 +78,7 @@ impl WasmPluginLoader {
 
         let engine = Engine::new(&config)?;
 
-        let mut stream = std::fs::read_dir(path)?;
+        let stream = std::fs::read_dir(path)?;
 
         let mut loaders = Vec::default();
 

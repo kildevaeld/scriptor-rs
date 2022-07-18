@@ -14,7 +14,6 @@ impl<'js> ObjectExt<'js> for Module<'js> {
         R: FromJs<'js>,
     {
         let func = self.get::<_, Function<'_>>(name)?;
-
         func.call(args)
     }
 }
@@ -26,7 +25,6 @@ impl<'js> ObjectExt<'js> for Object<'js> {
         R: FromJs<'js>,
     {
         let func = self.get::<_, Function<'_>>(name)?;
-
         func.call(args)
     }
 }
