@@ -72,14 +72,15 @@ impl Resolver for EsmModules {
     fn resolve<'js>(&mut self, ctx: Ctx<'js>, base: &str, name: &str) -> Result<String> {
         log::debug!("resolving: {} from parent: {}", name, base);
         let state = self.0.clone();
-        if name.starts_with(".") {
+        let path = RelativePath::new(name);
+        if name.starts_with(".") || path.extension().is_some() {
             log::debug!("resolving as file module: {}", name);
             let root = match Path::new(base).parent() {
                 Some(root) if root.is_absolute() => root,
                 _ => &state.cwd,
             };
 
-            let path = RelativePath::new(name);
+            // let path = RelativePath::new(name);
             let fp = path.to_logical_path(&root);
             if fp.exists() {
                 match fp.to_str() {
