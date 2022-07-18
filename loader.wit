@@ -4,5 +4,5 @@ variant compilation {
     failure(string)
 }
 
-transform: func(input: string) -> compilation
+transform: func(input: list<u8>) -> compilation
 extension: func() -> list<string>

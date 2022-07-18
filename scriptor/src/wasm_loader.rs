@@ -22,7 +22,7 @@ impl WasmLoader {
         let source = std::fs::read_to_string(path)?;
         let output = self
             .exports
-            .transform(&mut self.store, &source)
+            .transform(&mut self.store, source.as_bytes())
             .map_err(throw!())?;
 
         let output = match output {

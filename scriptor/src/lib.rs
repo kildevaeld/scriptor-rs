@@ -1,20 +1,24 @@
 #[macro_use]
 mod macros;
 
-pub mod esm_modules;
+pub mod esm;
+// pub mod esm_modules;
 
-pub use esm_modules as esm;
+// pub use esm_modules;
 
 #[cfg(feature = "vm")]
 mod vm;
 
+#[cfg(feature = "wasm")]
+pub mod wasm;
+
 // mod builder;
-#[cfg(any(feature = "fs", feature = "os"))]
-mod file_desc;
-pub mod global;
-mod process;
-#[cfg(any(feature = "fs", feature = "os"))]
-mod stream;
+// #[cfg(any(feature = "fs", feature = "os"))]
+// mod file_desc;
+// pub mod global;
+
+mod runtime;
+pub use self::runtime::*;
 
 pub mod bundle;
 mod ext;
@@ -51,10 +55,10 @@ pub use rquickjs::{Error, Result};
 
 pub use user_module::{IntoUserModule, UserModule, UserModuleImpl};
 
-#[cfg(any(feature = "fs", feature = "os"))]
-pub(crate) use file_desc::*;
-#[cfg(any(feature = "fs", feature = "os"))]
-pub(crate) use stream::*;
+// #[cfg(any(feature = "fs", feature = "os"))]
+// pub(crate) use file_desc::*;
+// #[cfg(any(feature = "fs", feature = "os"))]
+// pub(crate) use stream::*;
 
 pub use ext::*;
 

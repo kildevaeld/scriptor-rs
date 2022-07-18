@@ -3,15 +3,20 @@ wit_bindgen_rust::export!("../loader.wit");
 struct Loader;
 
 impl loader::Loader for Loader {
-    fn transform(source: String) -> loader::Compilation {
+    fn extension() -> Vec<String> {
+        vec![String::from("ts"), String::from("tsx")]
+    }
+
+    fn transform(input: Vec<u8>) -> loader::Compilation {
+        let source = match String::from_utf8(input) {
+            Ok(source) => source,
+            Err(err) => return loader::Compilation::Failure(err.to_string()),
+        };
+
         match compile("module.ts", source) {
             Ok(ret) => loader::Compilation::Success(ret),
             Err(err) => loader::Compilation::Failure(err.to_string()),
         }
-    }
-
-    fn extension() -> Vec<String> {
-        vec![String::from("ts"), String::from("tsx")]
     }
 }
 

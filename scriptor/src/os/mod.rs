@@ -1,6 +1,6 @@
 use rquickjs::{Class, Func, ModuleDef};
 
-use crate::file_desc::{FileDesc, Named};
+use crate::runtime::{FileDesc, Named};
 
 impl Named for tokio::io::Stdout {
     const NAME: &'static str = "Stdout";

@@ -344,10 +344,10 @@ macro_rules! reader {
 macro_rules! module_def {
     ($name: ident, $ident: ident) => {
         #[cfg(feature = "vm")]
-        impl $crate::user_module::IntoUserModule for $ident {
-            type UserModule = $crate::user_module::UserModuleImpl<$ident, &'static str>;
-            fn into_module(self) -> Self::UserModule {
-                $crate::user_module::UserModuleImpl::new(stringify!($name), self)
+        impl $crate::esm::IntoEsmModule for $ident {
+            type Module = $crate::esm::NativeModule<$ident, &'static str>;
+            fn into_module(self) -> Self::Module {
+                $crate::esm::NativeModule::new(stringify!($name))
             }
         }
     };

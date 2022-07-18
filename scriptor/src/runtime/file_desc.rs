@@ -6,7 +6,7 @@ use tokio::{
     sync::RwLock,
 };
 
-use crate::stream::JsStream;
+use super::stream::JsStream;
 
 pub struct FileDesc<F> {
     file: Arc<RwLock<F>>,

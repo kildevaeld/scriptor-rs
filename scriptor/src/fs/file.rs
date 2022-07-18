@@ -3,7 +3,7 @@ use rquickjs::{
 };
 use tokio::fs::File as TokioFile;
 
-use crate::file_desc::Named;
+use crate::runtime::Named;
 
 impl Named for TokioFile {
     const NAME: &'static str = "File";

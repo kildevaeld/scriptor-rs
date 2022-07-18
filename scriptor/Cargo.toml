@@ -6,7 +6,7 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = []
+default = ["wasm"]
 
 full = [
   "fs",
@@ -29,6 +29,11 @@ wasm = ["wasmtime", "wasmtime-wasi", "wit-bindgen-wasmtime", "anyhow", "tokio/fs
 name = "scriptor"
 path = "examples/scriptor.rs"
 required-features = ["full"]
+
+[[example]]
+name = "quick"
+path = "examples/quick.rs"
+required-features = ["wasm"]
 
 [dependencies]
 rquickjs = {version = "0.1", features = ["tokio", "macro", "futures", "loader", "array-buffer", "dyn-load", "exports"]}

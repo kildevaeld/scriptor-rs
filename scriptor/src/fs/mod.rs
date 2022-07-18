@@ -1,7 +1,7 @@
 mod file;
 mod read_dir;
 
-use crate::{stream::JsStream, FileDesc};
+use crate::{runtime::JsStream, FileDesc};
 use rquickjs::{Async, Class, Func, ModuleDef, Result};
 
 use self::read_dir::{DirEntry, ReadDir};
