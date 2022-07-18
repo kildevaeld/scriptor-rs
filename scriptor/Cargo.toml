@@ -23,8 +23,6 @@ vm = ["tokio/fs"]
 
 wasm = ["wasmtime", "wasmtime-wasi", "wit-bindgen-wasmtime", "anyhow", "tokio/fs"]
 
-# typescript = ["swc", "swc_common", "swc_ecma_parser"]
-
 [[example]]
 name = "scriptor"
 path = "examples/scriptor.rs"
