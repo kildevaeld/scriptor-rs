@@ -1,10 +1,10 @@
 mod bundle;
 #[cfg(feature = "fs")]
-mod fs;
+pub mod fs;
 #[cfg(feature = "http")]
-mod http;
+pub mod http;
 #[cfg(feature = "os")]
-mod os;
+pub mod os;
 
 #[cfg(feature = "http")]
 pub use self::http::HTTP;
