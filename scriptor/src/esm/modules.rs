@@ -70,8 +70,10 @@ pub struct EsmModules(Arc<EsmModuleState>);
 
 impl Resolver for EsmModules {
     fn resolve<'js>(&mut self, ctx: Ctx<'js>, base: &str, name: &str) -> Result<String> {
+        log::debug!("resolving: {} from parent: {}", name, base);
         let state = self.0.clone();
         if name.starts_with(".") {
+            log::debug!("resolving as file module: {}", name);
             let root = match Path::new(base).parent() {
                 Some(root) if root.is_absolute() => root,
                 _ => &state.cwd,
@@ -96,6 +98,7 @@ impl Resolver for EsmModules {
                 ))
             }
         } else {
+            log::debug!("resolving as native module: {}", name);
             state.modules.lock().unwrap().resolve(ctx, base, name)
         }
     }
