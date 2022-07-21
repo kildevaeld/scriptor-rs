@@ -31,3 +31,7 @@ pub use ext::*;
 
 #[cfg(feature = "worker")]
 pub use vm_worker::VmWorker;
+
+
+#[cfg(feature = "runtime")]
+pub use self::scriptor::*;

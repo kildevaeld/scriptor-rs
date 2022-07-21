@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use rquickjs::{Function, Module, Object, Result, Script};
+use rquickjs::{AsArguments, FromJs, Function, Module, Object, Promise, Result, Script};
 
 #[cfg(features = "wasm")]
 use crate::wasm::WasmPluginLoader;
@@ -70,23 +70,29 @@ pub struct Scriptor {
 }
 
 impl Scriptor {
-    pub async fn eval_path<V>(&self, path: impl AsRef<Path>) -> Result<V> {
-        self.vm.with(|ctx| {
-            let module = self.vm.modules().compile(ctx, path)?;
+    pub async fn eval_path<V, A>(&self, path: impl AsRef<Path>, args: A) -> Result<V>
+    where
+        for<'js> V: FromJs<'js> + 'static,
+        for<'js> A: AsArguments<'js>,
+    {
+        let ret = self
+            .vm
+            .with(|ctx| {
+                let module = self.vm.modules().compile(ctx, path)?;
 
-            let module = module.eval()?;
+                let module = module.eval()?;
 
-            module.meta::<Object>()?.set("main", true)?;
+                module.meta::<Object>()?.set("main", true)?;
 
-            let ret = if let Ok(main) = module.get::<_, Function>("main") {
-                Some(ctx.register(module.into()))
-            } else {
-                None
-            };
+                let main: Function = module.get("main")?;
 
-            Result::Ok(ret)
-        })?;
-        todo!()
+                let ret: Promise<V> = main.call(args)?;
+
+                Result::Ok(ret)
+            })?
+            .await?;
+
+        Ok(ret)
     }
 }
 

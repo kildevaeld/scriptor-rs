@@ -15,6 +15,7 @@ full = [
   "vm",
   "wasm",
   "worker",
+  "runtime",
 ]
 
 fs = ["tokio/fs"]
