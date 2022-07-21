@@ -14,6 +14,7 @@ full = [
   "http",
   "vm",
   "wasm",
+  "worker",
 ]
 
 fs = ["tokio/fs"]
@@ -22,6 +23,10 @@ os = ["tokio/io-std"]
 vm = ["tokio/fs"]
 
 wasm = ["wasmtime", "wasmtime-wasi", "wit-bindgen-wasmtime", "anyhow", "tokio/fs"]
+
+worker = ["value-quickjs", "rquickjs/registery", "vm"]
+
+runtime = ["anyhow", "vm"]
 
 [[example]]
 name = "scriptor"
@@ -56,6 +61,8 @@ directories = {version = "4"}
 wasmtime = {version = "0.38", optional = true}
 wasmtime-wasi = {version = "0.38", optional = true}
 wit-bindgen-wasmtime = {git = "https://github.com/bytecodealliance/wit-bindgen", optional = true}
+
+value-quickjs = {git = "https://github.com/kildevaeld/value-rs", optional = true}
 
 [dev-dependencies]
 tokio = {version = "1", features = ["sync", "io-util", "rt", "macros"]}

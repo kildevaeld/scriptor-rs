@@ -1,11 +1,14 @@
 use rquickjs::{Func, Promise};
 use scriptor::{global, modules, wasm, ObjectExt, VmBuilder};
+use tokio::task::LocalSet;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
     let source = tokio::fs::read_to_string("test.ts").await?;
 
-    tokio::task::LocalSet::default()
+    let local_set = LocalSet::default();
+
+    local_set
         .run_until(async move {
             let mut builder = VmBuilder::default();
 
@@ -26,7 +29,7 @@ async fn main() -> anyhow::Result<()> {
 
             // let mut vm = Vm::new(".").await?;
 
-            vm.with(|ctx| {
+            let key = vm.with(|ctx| {
                 //
 
                 ctx.globals().set(
@@ -39,15 +42,20 @@ async fn main() -> anyhow::Result<()> {
 
                 let module = ctx.compile("main", source)?;
 
-                let ret: Promise<()> = module.call("main", (100,))?;
+                // let ret: Promise<()> = module.call("main", (100,))?;
 
-                rquickjs::Result::Ok(ret)
-            })?
-            .await?;
+                rquickjs::Result::Ok(ctx.register(module.into()))
+            })?;
+
+            vm.idle().await;
+
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
             anyhow::Ok(())
         })
         .await?;
+
+    local_set.await;
 
     Ok(())
 }

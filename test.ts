@@ -1,6 +1,8 @@
 import { readFile, readDir, open } from "fs";
 import { pipe } from "pipe";
 
+delay(1000).then(() => print("Hello timeout"));
+
 // import greeting from "./import";
 // import { createConsole } from "util";
 

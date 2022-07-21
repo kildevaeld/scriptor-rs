@@ -4,7 +4,7 @@ use std::path::Path;
 #[cfg(feature = "os")]
 static MAIN: &'static str = include_str!("../lib/main.js");
 
-use crate::esm::EsmModulesBuilder;
+use crate::esm::{EsmModules, EsmModulesBuilder};
 
 #[derive(Default)]
 pub struct VmBuilder {
@@ -18,9 +18,28 @@ impl VmBuilder {
 
         rt.spawn_executor(rquickjs::Tokio);
 
-        self.modules.register(&rt)?;
+        let modules = self.modules.build()?;
 
-        Ok(Vm { rt, ctx })
+        modules.clone().register(&rt);
+
+        let cloned_modules = modules.clone();
+
+        ctx.with(move |ctx| {
+            let o = rquickjs::Object::new(ctx)?;
+
+            o.set("version", 1000)?;
+            o.set("modules", modules)?;
+
+            ctx.globals().set("Blume", o)?;
+
+            Result::Ok(())
+        })?;
+
+        Ok(Vm {
+            rt,
+            ctx,
+            modules: cloned_modules,
+        })
     }
 }
 
@@ -40,11 +59,16 @@ impl std::ops::DerefMut for VmBuilder {
 pub struct Vm {
     rt: Runtime,
     ctx: Context,
+    modules: EsmModules,
 }
 
 impl Vm {
     pub fn new() -> VmBuilder {
         VmBuilder::default()
+    }
+
+    pub fn modules(&self) -> &EsmModules {
+        &self.modules
     }
 
     pub fn with<F: FnOnce(Ctx) -> R, R>(&self, func: F) -> R {

@@ -1,6 +1,9 @@
 use super::{EsmLoader, EsmModule};
 use relative_path::RelativePath;
-use rquickjs::{Ctx, Error, Loader, Resolver, Result, Runtime};
+use rquickjs::{
+    ClassDef, ClassId, Ctx, Error, FromJs, IntoJs, Loaded, Loader, Module, Resolver, Result,
+    Runtime, Value,
+};
 use std::fs::canonicalize;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -43,7 +46,7 @@ impl EsmModulesBuilder {
         self
     }
 
-    pub fn register(self, runtime: &Runtime) -> rquickjs::Result<()> {
+    pub fn build(self) -> rquickjs::Result<EsmModules> {
         let esm = EsmModules(Arc::new(EsmModuleState {
             modules: Mutex::new(self.modules),
             cwd: match self.cwd {
@@ -53,9 +56,11 @@ impl EsmModulesBuilder {
             loaders: self.loaders,
         }));
 
-        runtime.set_loader(esm.clone(), esm);
+        Ok(esm)
+    }
 
-        Ok(())
+    pub fn register(self, runtime: &Runtime) -> rquickjs::Result<()> {
+        Ok(self.build()?.register(runtime))
     }
 }
 
@@ -67,6 +72,98 @@ struct EsmModuleState {
 
 #[derive(Clone)]
 pub struct EsmModules(Arc<EsmModuleState>);
+
+impl EsmModules {
+    pub fn register(self, runtime: &Runtime) {
+        runtime.set_loader(self.clone(), self);
+    }
+
+    pub fn compile<'js>(
+        &self,
+        ctx: Ctx<'js>,
+        name: impl AsRef<Path>,
+    ) -> Result<Module<'js, Loaded>> {
+        let mut path = name.as_ref().to_path_buf();
+
+        if !path.is_absolute() {
+            path = path.canonicalize()?;
+        }
+
+        let ext = match path.extension() {
+            Some(ext) => ext.to_string_lossy().to_string(),
+            None => {
+                return Err(Error::Exception {
+                    message: "invalid path".into(),
+                    file: "".into(),
+                    line: 0,
+                    stack: "".into(),
+                })
+            }
+        };
+
+        let state = self.0.clone();
+
+        let loaders = state
+            .loaders
+            .iter()
+            .filter(|loader| loader.extensions().contains(&ext));
+
+        let source: Vec<_> = std::fs::read(&path)?;
+        let mut last = None;
+        for loader in loaders {
+            match loader.load(ctx, &path, &source) {
+                Ok(ret) => return Ok(ret),
+                Err(err) => {
+                    last = Some(err);
+                    continue;
+                }
+            };
+        }
+
+        Err(last.unwrap_or_else(|| {
+            Error::new_loading_message(name.as_ref().to_string_lossy(), "no loader for file type")
+        }))
+    }
+}
+
+impl ClassDef for EsmModules {
+    const CLASS_NAME: &'static str = "Modules";
+
+    unsafe fn class_id() -> &'static mut rquickjs::ClassId {
+        static mut CLASS_ID: ClassId = ClassId::new();
+        &mut CLASS_ID
+    }
+
+    const HAS_PROTO: bool = false;
+
+    const HAS_STATIC: bool = false;
+
+    const HAS_REFS: bool = false;
+}
+
+impl<'js> IntoJs<'js> for EsmModules {
+    fn into_js(self, ctx: Ctx<'js>) -> Result<Value<'js>> {
+        self.into_js_obj(ctx)
+    }
+}
+
+impl<'js> FromJs<'js> for &'js EsmModules {
+    fn from_js(ctx: Ctx<'js>, value: Value<'js>) -> Result<Self> {
+        EsmModules::from_js_ref(ctx, value)
+    }
+}
+
+impl<'js> FromJs<'js> for &'js mut EsmModules {
+    fn from_js(ctx: Ctx<'js>, value: Value<'js>) -> Result<Self> {
+        EsmModules::from_js_mut(ctx, value)
+    }
+}
+
+impl<'js> FromJs<'js> for EsmModules {
+    fn from_js(ctx: Ctx<'js>, value: Value<'js>) -> Result<Self> {
+        EsmModules::from_js_obj(ctx, value)
+    }
+}
 
 impl Resolver for EsmModules {
     fn resolve<'js>(&mut self, ctx: Ctx<'js>, base: &str, name: &str) -> Result<String> {

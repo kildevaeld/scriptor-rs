@@ -1,4 +1,7 @@
-use std::{path::Path, sync::Mutex};
+use std::{
+    path::{Path, PathBuf},
+    sync::Mutex,
+};
 
 use crate::{esm::EsmLoader, wasm::util::instantiate};
 
@@ -66,6 +69,17 @@ pub fn open<P: AsRef<Path>>(engine: Engine, path: P) -> anyhow::Result<WasmLoade
 }
 
 impl WasmPluginLoader {
+    pub fn new_default() -> Result<WasmPluginLoader, anyhow::Error> {
+        let path = WasmPluginLoader::default_loader_dir();
+        WasmPluginLoader::new(path)
+    }
+
+    pub fn default_loader_dir() -> PathBuf {
+        let dirs =
+            directories::ProjectDirs::from("com", "Scriptor", "Scriptor").expect("directories");
+        dirs.config_dir().join("loaders")
+    }
+
     pub fn new(path: impl AsRef<Path>) -> Result<WasmPluginLoader, anyhow::Error> {
         let mut config = Config::default();
 

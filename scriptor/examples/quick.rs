@@ -9,7 +9,8 @@ fn main() -> anyhow::Result<()> {
         .with_cwd("./scriptor/examples")
         .with_module(modules::UTIL)
         .with_loader(esm::ScriptLoader::default())
-        .with_loader(wasm::WasmPluginLoader::new("./target/wasm32-wasi/release")?)
+        .with_loader(wasm::WasmPluginLoader::new_default()?)
+        // .with_loader(wasm::WasmPluginLoader::new("./target/wasm32-wasi/release")?)
         .register(&rt)?;
 
     ctx.with(|ctx| {

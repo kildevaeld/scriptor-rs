@@ -6,6 +6,9 @@ pub mod http;
 #[cfg(feature = "os")]
 pub mod os;
 
+// #[cfg(feature = "worker")]
+// pub mod worker;
+
 #[cfg(feature = "http")]
 pub use self::http::HTTP;
 

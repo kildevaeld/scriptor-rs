@@ -8,8 +8,14 @@ pub mod modules;
 #[cfg(feature = "vm")]
 mod vm;
 
+#[cfg(feature = "worker")]
+mod vm_worker;
+
 #[cfg(feature = "wasm")]
 pub mod wasm;
+
+#[cfg(feature = "runtime")]
+mod scriptor;
 
 mod runtime;
 pub use self::runtime::*;
@@ -22,3 +28,6 @@ pub use vm::{Vm, VmBuilder};
 pub use rquickjs::{Error, Result};
 
 pub use ext::*;
+
+#[cfg(feature = "worker")]
+pub use vm_worker::VmWorker;
